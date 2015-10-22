@@ -23,7 +23,7 @@ public class ExpressionCalculator implements ActionListener {
 	}
 	
 	public boolean debug = false; //Use this to turn command line messages on/off
-
+	String calcMode = "accumulator"; // Default mode is accumulator
     String newLine  = System.lineSeparator();
 
 	// GUI Objects
@@ -137,26 +137,35 @@ public class ExpressionCalculator implements ActionListener {
 			errorTF.setText("");
 			amountTF.setText("");
 		}
-		if (ae.getSource() == amountTF) parseInput();
+		if (ae.getSource() == amountTF) {
+			if(calcMode == "accumulator") parseAccumulatorInput();
+			else if(calcMode == "expression") parseExpressionInput();
+			else if(calcMode == "test") parseTestInput();
+			else if(calcMode == "graph") parseGraphInput();
+		}
 		if (ae.getSource() == itemAccumulator) {
+			calcMode = "accumulator";
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
 								"<br> Enter only 2 decimal places." +
 								"<br> You can enter a $ at the start if desired.</html>");
 		}
 		if (ae.getSource() == itemExpression) {
+			calcMode = "expression";
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
 								"<br> MORE INSTRUCTIONS </html>");
 		}
 		if (ae.getSource() == itemTest){
+			calcMode = "test";
 			calcWindow.setTitle("Calculator: Test Mode");
 			enterLabel.setText("<html><b>Test Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
 								"<br> MORE INSTRUCTIONS </html>");
 		}
 		if (ae.getSource() == itemGraph){
+			calcMode = "graph";
 			calcWindow.setTitle("Calculator: Graph Mode");
 			enterLabel.setText("<html><b>Graph Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -164,11 +173,14 @@ public class ExpressionCalculator implements ActionListener {
 		}
 	}
 
-    /*
+	
+	/*
+	 * Accumulator mode:
     This method parses the input and sends the clean properly formatted
     decimal to the accumulate and print method.
      */
-	private void parseInput() {
+	private void parseAccumulatorInput() {
+
         errorTF.setText(" "); // clear error each time calculate is pressed
         // clear text area if first time pressed
         if (logTextArea.getText().contains("Log text will go here"))
@@ -202,6 +214,33 @@ public class ExpressionCalculator implements ActionListener {
             System.out.println("Non-numeric value entered.");
             errorTF.setText("Please enter a numeric value.");
         }
+	}
+	
+	/*
+	 * Expression mode:
+    This method parses the input and sends the clean properly formatted
+    decimal to the accumulate and print method.
+     */
+	private void parseExpressionInput() {
+
+	}
+	
+	/*
+	 * Test mode:
+    This method parses the input and sends the clean properly formatted
+    decimal to the accumulate and print method.
+     */
+	private void parseTestInput() {
+
+	}
+	
+	/*
+	 * Graph mode:
+    This method parses the input and sends the clean properly formatted
+    decimal to the accumulate and print method.
+     */
+	private void parseGraphInput() {
+
 	}
 
     /*
