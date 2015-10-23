@@ -7,9 +7,12 @@ Justin Martin
 
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import javax.swing.*;
+
+import static java.lang.Math.*;
 
 public class ExpressionCalculator implements ActionListener {
 	
@@ -152,9 +155,12 @@ public class ExpressionCalculator implements ActionListener {
 			else if(calcMode == "expression") parseExpressionInput();
 			else if(calcMode == "test") parseTestInput();
 			else if(calcMode == "graph") parseGraphInput();
+			//System.out.println("enter pressed");
 		}
 		if (ae.getSource() == itemAccumulator) {
 			calcMode = "accumulator";
+			xInputLabel.show(false);
+			xInputTF.show(false);
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
 								"<br> Enter only 2 decimal places." +
@@ -172,6 +178,8 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemTest){
 			calcMode = "test";
+			xInputLabel.show(true);
+			xInputTF.show(true);
 			calcWindow.setTitle("Calculator: Test Mode");
 			enterLabel.setText("<html><b>Test Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -242,6 +250,68 @@ public class ExpressionCalculator implements ActionListener {
 			logTextArea.setText("");
 		}
 
+		// read input x value
+		String x = xInputTF.getText().trim();
+		Double xValue = 0.0;
+		if (x.equals("")) {
+			xValue = 0.0;
+		}
+		else if (x.equalsIgnoreCase("e")) xValue = E;
+		else if (x.equalsIgnoreCase("-e")) xValue = -E;
+		else if (x.equalsIgnoreCase("pi")) xValue = PI;
+		else if (x.equalsIgnoreCase("-pi")) xValue = -PI;
+		else {
+			try {
+				xValue = Double.parseDouble(x);
+				//System.out.println("double parse");
+			} catch (NumberFormatException nfe) {
+				errorTF.setText("Please set x to be a number");
+				//System.out.println("error in parse");
+				return;
+			}
+		}
+		//System.out.println("X value is: " + xValue);
+
+		// read input expression
+		String expression = amountTF.getText();
+		if (expression.length() == 0) errorTF.setText("Input an expression");
+
+		// set expression to known values
+		if (expression.endsWith("=")) // allow it but drop it
+			expression = expression.replace("=","");
+		if (expression.contains("R")) // replace R with r
+			expression = expression.replace("R", "r");
+		if (expression.contains("X"))
+			expression = expression.replace("X", "x");
+		if (expression.contains("E"))
+			expression = expression.replace("E", "e");
+		if (expression.contains("PI"))
+			expression = expression.replace("PI", "pi");
+		if (expression.contains("Pi"))
+			expression = expression.replace("Pi","pi");
+
+		// needs to be written
+		if (stringContainsIllegalCharacters(expression))
+			errorTF.setText("Expression contains an illegal character");
+
+		// replace unary operator (-) with (+u)
+		// needs to be written
+		expression = replaceUnary(expression);
+
+		// if parentheses don't exist, add them outside
+		// this makes it easier to just call one function to deal with everything
+		expression = addParentheses(expression);
+
+		// if parentheses exist, replace expression inside innermost one, call recursivly
+
+
+		System.out.println(expression);
+		// replace e, pi, and x with value
+
+
+
+		// if string contains
+
 
 	}
 	
@@ -293,5 +363,48 @@ public class ExpressionCalculator implements ActionListener {
         logTextArea.append(previousTotalString + " + " + inputString + " = " + totalString + newLine);
         amountTF.setText(" ");
     }
+
+	/*
+	This function can take two operands and an operator and return their value
+	 */
+	private double evaluateSimpleExpression(double left, char operator, double right)
+	{
+		switch (operator)
+		{
+			case '+': return left + right;
+			case '-': return left - right;
+			case '*': return left*right;
+			case '/': return left/right;
+			case '^': return pow(left,right);
+			case 'r': return pow(left, (1.0/right)); // evaluates roots
+			default: {
+				errorTF.setText("please only include: + - * / ^ r");
+				return 0;
+			}
+		}
+	}
+
+	private boolean stringContainsIllegalCharacters(String expression)
+	{
+		// check if expression has things not numbers or allowed values
+
+		return false; // no illegals
+	}
+
+	private String replaceUnary(String expression)
+	{
+		//if (expression.contains())
+
+		return expression;
+	}
+
+	private String addParentheses(String expression)
+	{
+		if(!expression.startsWith("("))
+			expression = "("+expression;
+		if(!expression.endsWith(")"))
+			expression = expression+")";
+		return expression;
+	}
 
 }
