@@ -5,6 +5,8 @@ Francesco Palermo
 Justin Martin
  */
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.lang.reflect.Array;
@@ -270,7 +272,7 @@ public class ExpressionCalculator implements ActionListener {
 				return;
 			}
 		}
-		//System.out.println("X value is: " + xValue);
+		System.out.println("X value is: " + xValue);
 
 		// read input expression
 		String expression = amountTF.getText();
@@ -301,16 +303,15 @@ public class ExpressionCalculator implements ActionListener {
 		// if parentheses don't exist, add them outside
 		// this makes it easier to just call one function to deal with everything
 		expression = addParentheses(expression);
+		if (expression == null) return;
 
-		// if parentheses exist, replace expression inside innermost one, call recursivly
-
+		// if parentheses exist, replace expression inside innermost one, call recursively
+		expression = recursiveReduce(expression);
 
 		System.out.println(expression);
-		// replace e, pi, and x with value
 
 
 
-		// if string contains
 
 
 	}
@@ -400,11 +401,66 @@ public class ExpressionCalculator implements ActionListener {
 
 	private String addParentheses(String expression)
 	{
-		if(!expression.startsWith("("))
-			expression = "("+expression;
-		if(!expression.endsWith(")"))
-			expression = expression+")";
+		if(expression.startsWith(")")) {
+			errorTF.setText("error in parentheses");
+			return null;
+		}
+
+		if(expression.endsWith("(")) {
+			errorTF.setText("error in parentheses");
+			return null;
+		}
+
+		expression = "("+expression;
+		expression = expression+")";
+		amountTF.setText(expression);
 		return expression;
+	}
+
+	private String recursiveReduce(String expression)
+	{
+		System.out.println(expression);
+		int openCount = expression.length() - expression.replace("(","").length();
+		int closeCount = expression.length() - expression.replace(")","").length();
+
+		if (openCount != closeCount) {
+			System.out.println("Please match parentheses");
+			errorTF.setText("Please match parentheses");
+			return expression;
+		}
+
+		// finds last () set in group
+		int lastOpen = expression.lastIndexOf("(");
+		System.out.println(lastOpen);
+		int matchingClose = expression.indexOf(")", lastOpen);
+		System.out.println(matchingClose);
+
+		// substring of last () set
+		String subString = expression.substring(lastOpen, matchingClose + 1);
+		System.out.println(subString);
+		String newString = evalExpression(subString);
+		System.out.println("returned string " + newString);
+
+		expression = expression.replace(subString,newString);
+		System.out.println("string after replacement " + expression);
+
+		if (openCount > 1)
+		{
+			System.out.println("recursive call");
+			expression = recursiveReduce(expression);
+		}
+
+		//System.out.println(openCount);
+		//System.out.println(closeCount);
+		return expression;
+
+	}
+
+	private String evalExpression(String expression)
+	{
+		//if(expression.contains("^"))
+		System.out.println("eval expression: " + expression);
+		return "i";
 	}
 
 }
