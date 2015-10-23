@@ -15,7 +15,7 @@ public class ExpressionCalculator implements ActionListener {
 	
 	public static void main(String[] args) {
 		System.out.println("Team 18");
-		System.out.println("Lab 9");
+		System.out.println("Lab 10");
 
 		new ExpressionCalculator();
         //if (args.length > 0) debug = true; // fix
@@ -35,6 +35,8 @@ public class ExpressionCalculator implements ActionListener {
 	JTextField  amountTF 		= new JTextField(12);
 	JTextField  totalTF   		= new JTextField(12);
 	JTextField  errorTF      	= new JTextField(12);
+	JTextField  xInputTF			= new JTextField(12);
+	JLabel 		xInputLabel		= new JLabel("x = ");
 	JLabel 		totalLabel 		= new JLabel("Total:");
 	JLabel 		errorLabel 		= new JLabel("Error:");
     JLabel      enterLabel      = new JLabel("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
@@ -90,7 +92,13 @@ public class ExpressionCalculator implements ActionListener {
 	    errorPanel.setLayout(new FlowLayout());
 	    errorPanel.add(errorLabel);
 	    errorPanel.add(errorTF);
-	    lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
+
+		errorPanel.add(xInputLabel);
+		errorPanel.add(xInputTF);
+		xInputLabel.show(false);
+		xInputTF.show(false);
+
+		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
         lowerTopPanel.add(enterLabel);
 	    lowerTopPanel.add(amountTF);  
 	    mainPanel.add(logTextScroll); // Add logTextScroll to bottom of mainPanel
@@ -118,6 +126,8 @@ public class ExpressionCalculator implements ActionListener {
 	    logTextArea.setWrapStyleWord(true);
 	    logTextArea.setText("Log text will go here.");
 	    logTextArea.setFont(new Font("default", Font.PLAIN, 12));
+
+		// action listeners
 	    clearButton.addActionListener(this);
         amountTF.addActionListener(this);
         itemAccumulator.addActionListener(this);
@@ -152,6 +162,9 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemExpression) {
 			calcMode = "expression";
+			// show x= box
+			xInputLabel.show(true);
+			xInputTF.show(true);
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -222,6 +235,13 @@ public class ExpressionCalculator implements ActionListener {
     decimal to the accumulate and print method.
      */
 	private void parseExpressionInput() {
+		errorTF.setText(" "); // clear error each time calculate is pressed
+		// clear text area if first time pressed
+		if (logTextArea.getText().contains("Log text will go here"))
+		{
+			logTextArea.setText("");
+		}
+
 
 	}
 	
@@ -261,16 +281,16 @@ public class ExpressionCalculator implements ActionListener {
         BigDecimal  totalBD = new BigDecimal(value,MathContext.DECIMAL64);//set precision to 16 digits
         totalBD = totalBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
 
-        BigDecimal previusTotalBD = new BigDecimal(prevVal,MathContext.DECIMAL64);//set precision to 16 digits
-        previusTotalBD = previusTotalBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
+        BigDecimal previousTotalBD = new BigDecimal(prevVal,MathContext.DECIMAL64);//set precision to 16 digits
+        previousTotalBD = previousTotalBD.setScale(2,BigDecimal.ROUND_UP);//scale (2) is # of digits to right of decimal point.
 
         String totalString = totalBD.toPlainString();// no exponents
-        String previusTotalString = previusTotalBD.toPlainString();
+        String previousTotalString = previousTotalBD.toPlainString();
         String inputString = inputBD.toPlainString();
 
         // set values to GUI
         totalTF.setText(totalString);
-        logTextArea.append(previusTotalString + " + " + inputString + " = " + totalString + newLine);
+        logTextArea.append(previousTotalString + " + " + inputString + " = " + totalString + newLine);
         amountTF.setText(" ");
     }
 
