@@ -26,8 +26,6 @@ public class ExpressionCalculator implements ActionListener {
 		System.out.println("Lab 10");
 
 		new ExpressionCalculator();
-        //if (args.length > 0) debug = true; // fix
-
 	}
 	
 	public boolean debug = false; //Use this to turn command line messages on/off
@@ -393,7 +391,10 @@ public class ExpressionCalculator implements ActionListener {
 			case "+": return left + right;
 			case "-": return left - right;
 			case "*": return left*right;
-			case "/": return left/right;
+			case "/":
+				if (right.equals(0.0))
+					return null;
+				return left/right;
 			case "^": return pow(left,right);
 			case "r": return pow(left, (1.0/right)); // evaluates roots
 			default: {
@@ -429,12 +430,11 @@ public class ExpressionCalculator implements ActionListener {
 			return null;
 		}
 
-		// check if there are values with implicit muliplication
+		// check if there are values with implicit multiplication
 
 
 		expression = "("+expression;
 		expression = expression+")";
-		//amountTF.setText(expression);  // got confusing since it added a new set of () each time
 		return expression;
 	}
 
@@ -489,6 +489,7 @@ public class ExpressionCalculator implements ActionListener {
 		System.out.println("eval expression: " + expression + " x value = " + xValue);
 
 		// split input expression inside () into an array of operators and operands
+		// this will look like xr2 = [x,2] and [r]
 		java.util.List<String> operatorList = new ArrayList<String>();
 		java.util.List<String> operandList = new ArrayList<String>();
 		StringTokenizer st = new StringTokenizer(expression, "+-*/^r", true);
@@ -500,55 +501,63 @@ public class ExpressionCalculator implements ActionListener {
 				operandList.add(token);
 			}
 		}
-		/*for (int i = 0; i < operandList.size(); i++)
-			operatorList.set(i,operandList.get(i).trim()); // cut white spaces
-
-		for (int i = 0; i < operatorList.size(); i++)
-			operatorList.set(i,operatorList.get(i).trim()); // cut white spaces
-		*/
 
 		System.out.println("Operators:" + operatorList);
 		System.out.println("Operands:" + operandList);
 
+		// checks that the number of operators is correct
 		if (operatorList.size() >= operandList.size())
 		{
 			errorTF.setText("Too many operators");
 			return null;
 		}
 
-		while (operatorList.size() > 0)
-			for (int i = 0; i < operatorList.size(); i++)
-			{
-				if((operatorList.get(i).equals("r")) || (operatorList.get(i).equals("^"))) {
-					System.out.println("found r");
+		// this should be doing the order of operations
+		while (operatorList.size() > 0) {
+			for (int i = 0; i < operatorList.size(); i++) {
+				if ((operatorList.get(i).equals("r")) || (operatorList.get(i).equals("^"))) {
+					System.out.println("found: " + operatorList.get(i));
 					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
 					operatorList.remove(i);
-					operandList.remove(i+1); // shorten list by 1
+					operandList.remove(i + 1); // shorten list by 1
+					i--; // decrement
 					System.out.println("operators list after r is found: " + operatorList);
-					System.out.println("Operand list after r is found: "+ operandList);
+					System.out.println("Operand list after r is found: " + operandList);
 				}
-				else if((operatorList.get(i).equals("*")) || (operatorList.get(i).equals("/"))) {
-					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
-					operatorList.remove(i);
-					operandList.remove(i+1); // shorten list by 1
-					System.out.println("operators list after r is found: " + operatorList);
-					System.out.println("Operand list after r is found: "+ operandList);
-				}
-				else if((operatorList.get(i).equals("+")) || (operatorList.get(i).equals("-"))) {
-					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
-					operatorList.remove(i);
-					operandList.remove(i+1); // shorten list by 1
-					System.out.println("operators list after r is found: " + operatorList);
-					System.out.println("Operand list after r is found: "+ operandList);
-				}
-
-
-
 			}
+			if ((!operatorList.contains("r")) && !operatorList.contains("^")) {
+				for (int i = 0; i < operatorList.size(); i++) {
+					if ((operatorList.get(i).equals("*")) || (operatorList.get(i).equals("/"))) {
+						System.out.println("found * or /");
+						if (Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)).equals(null))
+							return null;
+						operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+						operatorList.remove(i);
+						operandList.remove(i + 1); // shorten list by 1
+						i--;
+						System.out.println("operators list after r is found: " + operatorList);
+						System.out.println("Operand list after r is found: " + operandList);
+					}
+				}
+			}
+			if ((!operatorList.contains("*")) && !operatorList.contains("/")) {
+				for (int i = 0; i < operatorList.size(); i++) {
+					if ((operatorList.get(i).equals("+")) || (operatorList.get(i).equals("-"))) {
+						operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+						operatorList.remove(i);
+						operandList.remove(i + 1); // shorten list by 1
+						i--;
+						System.out.println("operators list after r is found: " + operatorList);
+						System.out.println("Operand list after r is found: " + operandList);
+					}
+				}
+			}
+		}
 
 		return operandList.get(0);
 
 
+		// this is old code that made one array with each piece
 		//String[] result = expression.split("(?<=[-+*/^r])|(?=[-+*/^r])");
 		/*for (int i = 0; i < result.length; i++)
 			result[i] = result[i].trim(); // cut white spaces
@@ -559,7 +568,7 @@ public class ExpressionCalculator implements ActionListener {
 		Double answer = evaluateSimpleExpression(result[0], result[1], result[2], xValue);
 		return Double.toString(answer);*/
 
-
+		// dummy return value to test recursion
 		//return "i";
 	}
 
