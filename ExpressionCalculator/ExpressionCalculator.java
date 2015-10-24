@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Arrays;
 import javax.swing.*;
 
 import static java.lang.Math.*;
@@ -292,6 +293,8 @@ public class ExpressionCalculator implements ActionListener {
 		if (expression.contains("Pi"))
 			expression = expression.replace("Pi","pi");
 
+		String origExpression = expression; // keep for log purposes
+
 		// needs to be written
 		if (stringContainsIllegalCharacters(expression))
 			errorTF.setText("Expression contains an illegal character");
@@ -301,14 +304,18 @@ public class ExpressionCalculator implements ActionListener {
 		expression = replaceUnary(expression);
 
 		// if parentheses don't exist, add them outside
+		// also checks mismatching ones
 		// this makes it easier to just call one function to deal with everything
 		expression = addParentheses(expression);
 		if (expression == null) return;
 
-		// if parentheses exist, replace expression inside innermost one, call recursively
-		expression = recursiveReduce(expression);
+		// replace expression inside innermost (), call recursively
+		// this will return the answer as a string
+		expression = recursiveReduce(expression,xValue);
+		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
 
-		System.out.println(expression);
+
+		//System.out.println(expression);
 
 
 
@@ -411,13 +418,16 @@ public class ExpressionCalculator implements ActionListener {
 			return null;
 		}
 
+		// check if there are values with implicit muliplication
+
+
 		expression = "("+expression;
 		expression = expression+")";
-		amountTF.setText(expression);
+		//amountTF.setText(expression);  // got confusing since it added a new set of () each time
 		return expression;
 	}
 
-	private String recursiveReduce(String expression)
+	private String recursiveReduce(String expression, Double xValue)
 	{
 		System.out.println(expression);
 		int openCount = expression.length() - expression.replace("(","").length();
@@ -438,7 +448,7 @@ public class ExpressionCalculator implements ActionListener {
 		// substring of last () set
 		String subString = expression.substring(lastOpen, matchingClose + 1);
 		System.out.println(subString);
-		String newString = evalExpression(subString);
+		String newString = evalExpression(subString, xValue);
 		System.out.println("returned string " + newString);
 
 		expression = expression.replace(subString,newString);
@@ -447,7 +457,7 @@ public class ExpressionCalculator implements ActionListener {
 		if (openCount > 1)
 		{
 			System.out.println("recursive call");
-			expression = recursiveReduce(expression);
+			expression = recursiveReduce(expression,xValue);
 		}
 
 		//System.out.println(openCount);
@@ -456,10 +466,21 @@ public class ExpressionCalculator implements ActionListener {
 
 	}
 
-	private String evalExpression(String expression)
+	// Input an expression between parentheses and an x value,
+	// solve expression using order of operations and return a string value
+	private String evalExpression(String expression, Double xValue)
 	{
-		//if(expression.contains("^"))
-		System.out.println("eval expression: " + expression);
+		if (expression.startsWith("("))
+			expression = expression.replace("(","");
+		if (expression.endsWith(")"))
+			expression = expression.replace(")","");
+		System.out.println("eval expression: " + expression + " x value = " + xValue);
+
+		// split input expression inside () into an array of operators and operands
+		String[] result = expression.split("(?<=[-+*/^r])|(?=[-+*/^r])");
+		System.out.println(Arrays.toString(result));
+
+
 		return "i";
 	}
 
