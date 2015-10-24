@@ -158,7 +158,6 @@ public class ExpressionCalculator implements ActionListener {
 			else if(calcMode == "expression") parseExpressionInput();
 			else if(calcMode == "test") parseTestInput();
 			else if(calcMode == "graph") parseGraphInput();
-			//System.out.println("enter pressed");
 		}
 		if (ae.getSource() == itemAccumulator) {
 			calcMode = "accumulator";
@@ -242,8 +241,13 @@ public class ExpressionCalculator implements ActionListener {
 	
 	/*
 	 * Expression mode:
-    This method parses the input and sends the clean properly formatted
-    decimal to the accumulate and print method.
+    This method parses the input and does:
+    1. calls function to set x value
+    2. calls function to read in expression
+    	in this mode everything after = is cut
+    3. checks function for illegal characters like a or z
+    4. checks function for negative unary operator and replaces with u
+    5.
      */
 	private void parseExpressionInput() {
 		errorTF.setText(" "); // clear error each time calculate is pressed
@@ -254,58 +258,25 @@ public class ExpressionCalculator implements ActionListener {
 		}
 
 		// read input x value
-		String x = xInputTF.getText().trim();
-		Double xValue = 0.0;
-		if (x.equals("")) {
-			xValue = 0.0;
-		}
-		else if (x.equalsIgnoreCase("e")) xValue = E;
-		else if (x.equalsIgnoreCase("-e")) xValue = -E;
-		else if (x.equalsIgnoreCase("pi")) xValue = PI;
-		else if (x.equalsIgnoreCase("-pi")) xValue = -PI;
-		else {
-			try {
-				xValue = Double.parseDouble(x);
-				//System.out.println("double parse");
-			} catch (NumberFormatException nfe) {
-				errorTF.setText("Please set x to be a number");
-				//System.out.println("error in parse");
-				return;
-			}
-		}
+		Double xValue = readXValue();
+		if (xValue.equals(null)) return;
 		System.out.println("X value is: " + xValue);
 
 		// read input expression
-		String expression = amountTF.getText();
-		if (expression.length() == 0) errorTF.setText("Input an expression");
+		String expression = readExpression();
+		String origExpression = expression; // keep input version for log printing purposes
 
-		// set expression to known values
-		if (expression.endsWith("=")) // allow it but drop it
-			expression = expression.replace("=","");
-		if (expression.contains("R")) // replace R with r
-			expression = expression.replace("R", "r");
-		if (expression.contains("X"))
-			expression = expression.replace("X", "x");
-		if (expression.contains("E"))
-			expression = expression.replace("E", "e");
-		if (expression.contains("PI"))
-			expression = expression.replace("PI", "pi");
-		if (expression.contains("Pi"))
-			expression = expression.replace("Pi","pi");
-
-		String origExpression = expression; // keep for log purposes
-
-		// needs to be written
+		// NEEDS TO BE WRITTEN
 		if (stringContainsIllegalCharacters(expression))
 			errorTF.setText("Expression contains an illegal character");
 
 		// replace unary operator (-) with (+u)
-		// needs to be written
+		// NEEDS TO BE WRITTEN
 		expression = replaceUnary(expression);
+		if (expression.equals(null)) return;
 
-		// if parentheses don't exist, add them outside
-		// also checks mismatching ones
-		// this makes it easier to just call one function to deal with everything
+		// Add () to outside if they don't exist. This is required for the recursive call
+		// the later functions parse everything based on the ()
 		expression = addParentheses(expression);
 		if (expression == null) return;
 
@@ -313,17 +284,15 @@ public class ExpressionCalculator implements ActionListener {
 		// this will return the answer as a string
 		expression = recursiveReduce(expression,xValue);
 		if (expression.equals(null)) return;
+
+		// print expression + answer
 		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
-
-
-		//System.out.println(expression);
-
 	}
 	
 	/*
 	 * Test mode:
-    This method parses the input and sends the clean properly formatted
-    decimal to the accumulate and print method.
+    This method parses works exactly the same as the expression input BUT it checks the input expression for
+    an equals sign and runs everything twice for both sides
      */
 	private void parseTestInput() {
 
@@ -369,6 +338,56 @@ public class ExpressionCalculator implements ActionListener {
         amountTF.setText(" ");
     }
 
+	private Double readXValue()
+	{
+		String x = xInputTF.getText().trim();
+		Double xValue;
+		if (x.equals("")) {
+			xValue = 0.0;
+		}
+		else if (x.equalsIgnoreCase("e")) xValue = E;
+		else if (x.equalsIgnoreCase("-e")) xValue = -E;
+		else if (x.equalsIgnoreCase("pi")) xValue = PI;
+		else if (x.equalsIgnoreCase("-pi")) xValue = -PI;
+		else {
+			try {
+				xValue = Double.parseDouble(x);
+			} catch (NumberFormatException nfe) {
+				errorTF.setText("Please set x to be a number");
+				return null;
+			}
+		}
+		return xValue;
+	}
+
+	/*
+	This function reads in the input expression from field and parses it
+	 */
+	private String readExpression()
+	{
+		String expression = amountTF.getText();
+		if (expression.length() == 0) errorTF.setText("Input an expression");
+
+		// set expression to known values
+		if (expression.contains("=")) {
+			// delete everything after =
+			expression = expression.split("=")[0];
+			errorTF.setText("everything after = removed");
+		}
+		if (expression.contains("R")) // replace R with r
+			expression = expression.replace("R", "r");
+		if (expression.contains("X"))
+			expression = expression.replace("X", "x");
+		if (expression.contains("E"))
+			expression = expression.replace("E", "e");
+		if (expression.contains("PI"))
+			expression = expression.replace("PI", "pi");
+		if (expression.contains("Pi"))
+			expression = expression.replace("Pi","pi");
+
+		return expression;
+	}
+
 	/*
 	This function can take two operands and an operator and return their value
 	 */
@@ -379,11 +398,19 @@ public class ExpressionCalculator implements ActionListener {
 		if(leftString.contains("x")) left = xValue;
 		else if(leftString.contains("e")) left = E;
 		else if(leftString.contains("pi")) left = PI;
+		else if(leftString.contains("u")) {
+			leftString = leftString.replace("u","-"); // unary indicator for negative number
+			left = Double.parseDouble(leftString);
+		}
 		else left = Double.parseDouble(leftString);
 
 		if(rightString.contains("x")) right = xValue;
 		else if(rightString.contains("e")) right = E;
 		else if(rightString.contains("pi")) right = PI;
+		else if(rightString.contains("u")) {
+			rightString = rightString.replace("u","-"); // unary indicator for negative number
+			right = Double.parseDouble(rightString);
+		}
 		else right = Double.parseDouble(rightString);
 
 		switch (operator)
@@ -430,7 +457,7 @@ public class ExpressionCalculator implements ActionListener {
 			return null;
 		}
 
-		// check if there are values with implicit multiplication
+		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
 
 
 		expression = "("+expression;
@@ -440,7 +467,7 @@ public class ExpressionCalculator implements ActionListener {
 
 	private String recursiveReduce(String expression, Double xValue)
 	{
-		System.out.println(expression);
+		System.out.println("Expression is: " + expression);
 		int openCount = expression.length() - expression.replace("(","").length();
 		int closeCount = expression.length() - expression.replace(")","").length();
 
@@ -452,28 +479,27 @@ public class ExpressionCalculator implements ActionListener {
 
 		// finds last () set in group
 		int lastOpen = expression.lastIndexOf("(");
-		System.out.println(lastOpen);
+		//System.out.println(lastOpen);
 		int matchingClose = expression.indexOf(")", lastOpen);
-		System.out.println(matchingClose);
+		//System.out.println(matchingClose);
 
 		// substring of last () set
 		String subString = expression.substring(lastOpen, matchingClose + 1);
-		System.out.println(subString);
+		System.out.println("Program will evaluate this substring: " + subString);
 		String newString = evalExpression(subString, xValue);
 		if(newString.equals(null)) return null;
-		System.out.println("returned string " + newString);
+		System.out.println("returned string after evaluation" + newString);
 
 		expression = expression.replace(subString,newString);
-		System.out.println("string after replacement " + expression);
+		expression = replaceUnary(expression); // need to fix new string if unary characters are present
+		System.out.println("Expression after replacement " + expression);
 
+		// while there are still ( present, keep calling the recursive reduce
 		if (openCount > 1)
 		{
-			System.out.println("recursive call");
 			expression = recursiveReduce(expression,xValue);
 		}
 
-		//System.out.println(openCount);
-		//System.out.println(closeCount);
 		return expression;
 
 	}
@@ -486,7 +512,7 @@ public class ExpressionCalculator implements ActionListener {
 			expression = expression.replace("(","");
 		if (expression.endsWith(")"))
 			expression = expression.replace(")","");
-		System.out.println("eval expression: " + expression + " x value = " + xValue);
+		System.out.println("eval expression: " + expression + " with give x value = " + xValue);
 
 		// split input expression inside () into an array of operators and operands
 		// this will look like xr2 = [x,2] and [r]
@@ -502,17 +528,17 @@ public class ExpressionCalculator implements ActionListener {
 			}
 		}
 
-		System.out.println("Operators:" + operatorList);
-		System.out.println("Operands:" + operandList);
+		System.out.println("Operators:" + operatorList); // something like [r,*,^]
+		System.out.println("Operands:" + operandList); // something like [x,1,5,e]
 
 		// checks that the number of operators is correct
 		if (operatorList.size() >= operandList.size())
 		{
-			errorTF.setText("Too many operators");
+			errorTF.setText("Too many operators"); // this will be messed up if the unary operation is not correct
 			return null;
 		}
 
-		// this should be doing the order of operations
+		// this does the order of operations using the two lists
 		while (operatorList.size() > 0) {
 			for (int i = 0; i < operatorList.size(); i++) {
 				if ((operatorList.get(i).equals("r")) || (operatorList.get(i).equals("^"))) {
@@ -529,8 +555,10 @@ public class ExpressionCalculator implements ActionListener {
 				for (int i = 0; i < operatorList.size(); i++) {
 					if ((operatorList.get(i).equals("*")) || (operatorList.get(i).equals("/"))) {
 						System.out.println("found * or /");
+						// this does not work
 						if (Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)).equals(null))
-							return null;
+							System.out.println("divide by 0");
+						// does not properly check for null return
 						operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
 						operatorList.remove(i);
 						operandList.remove(i + 1); // shorten list by 1
@@ -553,23 +581,7 @@ public class ExpressionCalculator implements ActionListener {
 				}
 			}
 		}
-
-		return operandList.get(0);
-
-
-		// this is old code that made one array with each piece
-		//String[] result = expression.split("(?<=[-+*/^r])|(?=[-+*/^r])");
-		/*for (int i = 0; i < result.length; i++)
-			result[i] = result[i].trim(); // cut white spaces
-		System.out.println(Arrays.toString(result));
-		if(result.length == 1) return result[0];
-
-		// find highest order operator and send it and the two operands
-		Double answer = evaluateSimpleExpression(result[0], result[1], result[2], xValue);
-		return Double.toString(answer);*/
-
-		// dummy return value to test recursion
-		//return "i";
+		return operandList.get(0); // returns final value equivalent to what was inside the ()
 	}
 
 }
