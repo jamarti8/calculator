@@ -395,7 +395,9 @@ public class ExpressionCalculator implements ActionListener {
 	{
 		Double left;
 		Double right;
-		if(leftString.contains("x")) left = xValue;
+
+		if(leftString.contains("ux")) left = -xValue;
+		else if(leftString.contains("x")) left = xValue;
 		else if(leftString.contains("e")) left = E;
 		else if(leftString.contains("pi")) left = PI;
 		else if(leftString.contains("u")) {
@@ -404,7 +406,8 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		else left = Double.parseDouble(leftString);
 
-		if(rightString.contains("x")) right = xValue;
+		if(rightString.contains("ux")) right = -xValue;
+		else if(rightString.contains("x")) right = xValue;
 		else if(rightString.contains("e")) right = E;
 		else if(rightString.contains("pi")) right = PI;
 		else if(rightString.contains("u")) {
