@@ -8,11 +8,13 @@ Justin Martin
 import com.sun.xml.internal.ws.util.StringUtils;
 
 import java.awt.*;
+import java.awt.List;
 import java.awt.event.*;
+import java.awt.geom.Arc2D;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.Arrays;
+import java.util.*;
 import javax.swing.*;
 
 import static java.lang.Math.*;
@@ -312,14 +314,11 @@ public class ExpressionCalculator implements ActionListener {
 		// replace expression inside innermost (), call recursively
 		// this will return the answer as a string
 		expression = recursiveReduce(expression,xValue);
+		if (expression.equals(null)) return;
 		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
 
 
 		//System.out.println(expression);
-
-
-
-
 
 	}
 	
@@ -375,19 +374,31 @@ public class ExpressionCalculator implements ActionListener {
 	/*
 	This function can take two operands and an operator and return their value
 	 */
-	private double evaluateSimpleExpression(double left, char operator, double right)
+	private Double evaluateSimpleExpression(String leftString, String operator, String rightString, Double xValue)
 	{
+		Double left;
+		Double right;
+		if(leftString.contains("x")) left = xValue;
+		else if(leftString.contains("e")) left = E;
+		else if(leftString.contains("pi")) left = PI;
+		else left = Double.parseDouble(leftString);
+
+		if(rightString.contains("x")) right = xValue;
+		else if(rightString.contains("e")) right = E;
+		else if(rightString.contains("pi")) right = PI;
+		else right = Double.parseDouble(rightString);
+
 		switch (operator)
 		{
-			case '+': return left + right;
-			case '-': return left - right;
-			case '*': return left*right;
-			case '/': return left/right;
-			case '^': return pow(left,right);
-			case 'r': return pow(left, (1.0/right)); // evaluates roots
+			case "+": return left + right;
+			case "-": return left - right;
+			case "*": return left*right;
+			case "/": return left/right;
+			case "^": return pow(left,right);
+			case "r": return pow(left, (1.0/right)); // evaluates roots
 			default: {
 				errorTF.setText("please only include: + - * / ^ r");
-				return 0;
+				return 0.0;
 			}
 		}
 	}
@@ -449,6 +460,7 @@ public class ExpressionCalculator implements ActionListener {
 		String subString = expression.substring(lastOpen, matchingClose + 1);
 		System.out.println(subString);
 		String newString = evalExpression(subString, xValue);
+		if(newString.equals(null)) return null;
 		System.out.println("returned string " + newString);
 
 		expression = expression.replace(subString,newString);
@@ -477,11 +489,78 @@ public class ExpressionCalculator implements ActionListener {
 		System.out.println("eval expression: " + expression + " x value = " + xValue);
 
 		// split input expression inside () into an array of operators and operands
-		String[] result = expression.split("(?<=[-+*/^r])|(?=[-+*/^r])");
+		java.util.List<String> operatorList = new ArrayList<String>();
+		java.util.List<String> operandList = new ArrayList<String>();
+		StringTokenizer st = new StringTokenizer(expression, "+-*/^r", true);
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if ("+-/*^r".contains(token)) {
+				operatorList.add(token);
+			} else {
+				operandList.add(token);
+			}
+		}
+		/*for (int i = 0; i < operandList.size(); i++)
+			operatorList.set(i,operandList.get(i).trim()); // cut white spaces
+
+		for (int i = 0; i < operatorList.size(); i++)
+			operatorList.set(i,operatorList.get(i).trim()); // cut white spaces
+		*/
+
+		System.out.println("Operators:" + operatorList);
+		System.out.println("Operands:" + operandList);
+
+		if (operatorList.size() >= operandList.size())
+		{
+			errorTF.setText("Too many operators");
+			return null;
+		}
+
+		while (operatorList.size() > 0)
+			for (int i = 0; i < operatorList.size(); i++)
+			{
+				if((operatorList.get(i).equals("r")) || (operatorList.get(i).equals("^"))) {
+					System.out.println("found r");
+					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+					operatorList.remove(i);
+					operandList.remove(i+1); // shorten list by 1
+					System.out.println("operators list after r is found: " + operatorList);
+					System.out.println("Operand list after r is found: "+ operandList);
+				}
+				else if((operatorList.get(i).equals("*")) || (operatorList.get(i).equals("/"))) {
+					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+					operatorList.remove(i);
+					operandList.remove(i+1); // shorten list by 1
+					System.out.println("operators list after r is found: " + operatorList);
+					System.out.println("Operand list after r is found: "+ operandList);
+				}
+				else if((operatorList.get(i).equals("+")) || (operatorList.get(i).equals("-"))) {
+					operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+					operatorList.remove(i);
+					operandList.remove(i+1); // shorten list by 1
+					System.out.println("operators list after r is found: " + operatorList);
+					System.out.println("Operand list after r is found: "+ operandList);
+				}
+
+
+
+			}
+
+		return operandList.get(0);
+
+
+		//String[] result = expression.split("(?<=[-+*/^r])|(?=[-+*/^r])");
+		/*for (int i = 0; i < result.length; i++)
+			result[i] = result[i].trim(); // cut white spaces
 		System.out.println(Arrays.toString(result));
+		if(result.length == 1) return result[0];
+
+		// find highest order operator and send it and the two operands
+		Double answer = evaluateSimpleExpression(result[0], result[1], result[2], xValue);
+		return Double.toString(answer);*/
 
 
-		return "i";
+		//return "i";
 	}
 
 }
