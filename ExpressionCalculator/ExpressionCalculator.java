@@ -39,17 +39,21 @@ public class ExpressionCalculator implements ActionListener {
 	JTextArea   logTextArea     = new JTextArea();
 	JScrollPane inScrollPane    = new JScrollPane(logTextArea);
 	JTextField  amountTF 		= new JTextField(12);
-	JTextField  totalTF   		= new JTextField(12);
+	JTextField  resultTF   		= new JTextField(12);
 	JTextField  errorTF      	= new JTextField(12);
-	JTextField  xInputTF			= new JTextField(12);
+	JTextField  xInputTF		= new JTextField(12);
+	JTextField  totalCorrectTF	= new JTextField(12);
+	JTextField  totalWrongTF= new JTextField(12);
 	JLabel 		xInputLabel		= new JLabel("x = ");
-	JLabel 		totalLabel 		= new JLabel("Total:");
+	JLabel 		resultLabel		= new JLabel("Result:");
 	JLabel 		errorLabel 		= new JLabel("Error:");
     JLabel      enterLabel      = new JLabel("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
             "<br> Enter only 2 decimal places." +
             "<br> You can enter a $ at the start if desired.</html>");
 	JLabel 		emptyLabel 		= new JLabel("");
 	JLabel 		emptyLabel2 	= new JLabel("");
+	JLabel 		totalCorrectLabel = new JLabel("Total Correct:");
+	JLabel 		totalWrongLabel = new JLabel("Total Wrong:");
 	JButton 	clearButton    	= new JButton("Clear");
 	JPanel 		upperTopPanel 	= new JPanel();
 	JPanel 		lowerTopPanel 	= new JPanel();
@@ -57,6 +61,8 @@ public class ExpressionCalculator implements ActionListener {
 	JPanel 		totalPanel 		= new JPanel();
 	JPanel 		errorPanel 		= new JPanel();
 	JPanel 		enterPanel 		= new JPanel();
+	JPanel 		middleLeftPanel	= new JPanel();
+	JPanel 		correctPanel 	= new JPanel();
 	JPanel 		xInputPanel		= new JPanel();
 	JScrollPane logTextScroll 	= new JScrollPane(logTextArea);
 	GridLayout 	oneByThree 		= new GridLayout(1,3); // rows, cols
@@ -65,6 +71,7 @@ public class ExpressionCalculator implements ActionListener {
 	GridLayout oneByOne			= new GridLayout(1,1);
 	GroupLayout gLayoutTotal 	= new GroupLayout(upperTopPanel);
 	GroupLayout gLayoutEnter	= new GroupLayout(enterPanel);
+	GroupLayout gLayoutCorrect  = new GroupLayout(correctPanel);
 	static double value = 0;
 	
 	JMenuBar    menuBar         = new JMenuBar();
@@ -97,18 +104,16 @@ public class ExpressionCalculator implements ActionListener {
 	    upperTopPanel.add(totalPanel);
 	    upperTopPanel.add(errorPanel);
 	    totalPanel.setLayout(new FlowLayout());
-	    totalPanel.add(totalLabel);  
-	    totalPanel.add(totalTF);
+	    totalPanel.add(resultLabel);  
+	    totalPanel.add(resultTF);
 	    errorPanel.setLayout(new FlowLayout());
 	    errorPanel.add(errorLabel);
 	    errorPanel.add(errorTF);
 
-		//errorPanel.add(xInputLabel);
-		//errorPanel.add(xInputTF);
-		//xInputLabel.show(false);
-		//xInputTF.show(false);
-
-		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
+		
+		middleLeftPanel.setLayout(oneByTwo);
+		middleLeftPanel.add(enterPanel);
+		middleLeftPanel.add(correctPanel);
 		enterPanel.add(enterLabel);
 		gLayoutEnter.setVerticalGroup(
 				   gLayoutEnter.createSequentialGroup()
@@ -117,14 +122,25 @@ public class ExpressionCalculator implements ActionListener {
 				           .addComponent(xInputPanel)
 				      )
 				);
+		gLayoutCorrect.setVerticalGroup(
+				   gLayoutCorrect.createParallelGroup(GroupLayout.Alignment.CENTER)
+				      .addGroup(gLayoutCorrect.createSequentialGroup()
+				           .addComponent(totalCorrectLabel)
+				           .addComponent(totalCorrectTF)
+				      )
+				      .addGroup(gLayoutCorrect.createSequentialGroup()
+					           .addComponent(totalWrongLabel)
+					           .addComponent(totalWrongTF)
+					      )
+				);
+		xInputPanel.setLayout(new FlowLayout());
 		xInputPanel.add(xInputLabel);
 		xInputPanel.add(xInputTF);
 		xInputPanel.setVisible(false);
-		//enterPanel.setLayout(oneByOne);
-		xInputPanel.setLayout(new FlowLayout());
+		correctPanel.setVisible(false);
 		
-		
-		lowerTopPanel.add(enterPanel);
+		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
+		lowerTopPanel.add(middleLeftPanel);
         lowerTopPanel.add(amountTF);
 	    
 	    mainPanel.add(logTextScroll); // Add logTextScroll to bottom of mainPanel
@@ -137,21 +153,28 @@ public class ExpressionCalculator implements ActionListener {
 		logTextArea.setEditable(false);
 		calcWindow.setTitle("Calculator: Accumulator Mode");
 		calcWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		totalLabel.setFont(new Font("default", Font.BOLD, 20));
-		totalTF.setFont(new Font("default", Font.PLAIN, 25));
-		totalTF.setEditable(false);
-		totalTF.setColumns(17);
+		resultLabel.setFont(new Font("default", Font.BOLD, 20));
+		resultTF.setFont(new Font("default", Font.PLAIN, 25));
+		resultTF.setEditable(false);
+		resultTF.setColumns(17);
+		resultTF.setText("00.00");
 		errorTF.setFont(new Font("default", Font.PLAIN, 25));
 		errorTF.setEditable(false);
 		errorTF.setColumns(17);
+		totalCorrectTF.setText("0");
+		totalCorrectTF.setHorizontalAlignment(JTextField.CENTER);
+		totalWrongTF.setText("0");
+		totalWrongTF.setHorizontalAlignment(JTextField.CENTER);
 		errorLabel.setFont(new Font("default", Font.BOLD, 20));
 		enterLabel.setFont(new Font("default", Font.PLAIN, 12));
-		totalTF.setText("00.00");
+		
 		amountTF.setFont(new Font("default", Font.BOLD, 25));
 	    logTextArea.setLineWrap(true);
 	    logTextArea.setWrapStyleWord(true);
 	    logTextArea.setText("Log text will go here.");
 	    logTextArea.setFont(new Font("default", Font.PLAIN, 12));
+	    totalCorrectTF.setEditable(false);
+	    totalWrongTF.setEditable(false);
 
 		// action listeners
 	    clearButton.addActionListener(this);
@@ -162,14 +185,15 @@ public class ExpressionCalculator implements ActionListener {
         itemGraph.addActionListener(this);
 
 		// Show the window
-	    calcWindow.setSize(700, 550);
+	    calcWindow.setSize(990, 550);
+	    calcWindow.setMinimumSize(new Dimension(990,550));
 	    calcWindow.setVisible(true); // show the graphics window
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource() == clearButton){
-			totalTF.setText("00.00");
+			resultTF.setText("00.00");
 			errorTF.setText("");
 			amountTF.setText("");
 		}
@@ -182,6 +206,7 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemAccumulator) {
 			calcMode = "accumulator";
 			xInputPanel.setVisible(false);
+			correctPanel.setVisible(false);
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
 								"<br> Enter only 2 decimal places." +
@@ -189,10 +214,8 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemExpression) {
 			calcMode = "expression";
-			// show x= box
-			//xInputLabel.show(true);
-			//xInputTF.show(true);
 			xInputPanel.setVisible(true);
+			correctPanel.setVisible(false);
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -200,8 +223,8 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemTest){
 			calcMode = "test";
-			xInputLabel.show(true);
-			xInputTF.show(true);
+			xInputPanel.setVisible(true);
+			correctPanel.setVisible(true);
 			calcWindow.setTitle("Calculator: Test Mode");
 			enterLabel.setText("<html><b>Test Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -209,6 +232,7 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemGraph){
 			calcMode = "graph";
+			xInputPanel.setVisible(true);
 			calcWindow.setTitle("Calculator: Graph Mode");
 			enterLabel.setText("<html><b>Graph Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -306,17 +330,79 @@ public class ExpressionCalculator implements ActionListener {
 		if (expression.equals(null)) return;
 
 		// print expression + answer
-		totalTF.setText(expression.toString());
+		resultTF.setText(expression.toString());
 		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
 	}
 	
+	private void printAnswer(String expression, String origExpression, Double xValue){
+		// print expression + answer
+		resultTF.setText(expression.toString());
+		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
+	}
 	/*
 	 * Test mode:
     This method parses works exactly the same as the expression input BUT it checks the input expression for
     an equals sign and runs everything twice for both sides
      */
 	private void parseTestInput() {
+		errorTF.setText(" "); // clear error each time calculate is pressed
+		// clear text area if first time pressed
+		if (logTextArea.getText().contains("Log text will go here"))
+		{
+			logTextArea.setText("");
+		}
 
+		// read input x value
+		Double xValue = readXValue();
+		if (xValue.equals(null)) return;
+		System.out.println("X value is: " + xValue);
+
+		// read input expression
+		String[] expression = readTestExpression();
+		String leftExpression = expression[0];
+		String rightExpression = expression[1];
+		String origExpression = leftExpression+" = "+rightExpression; // keep input version for log printing purposes
+		
+		// NEEDS TO BE WRITTEN
+		if (stringContainsIllegalCharacters(leftExpression))
+			errorTF.setText("Left expression contains an illegal character");
+		if (stringContainsIllegalCharacters(rightExpression))
+			errorTF.setText("Right expression contains an illegal character");
+		
+		// replace unary operator (-) with (+u)
+		// NEEDS TO BE WRITTEN
+		leftExpression = replaceUnary(leftExpression);
+		if (leftExpression.equals(null)) return;
+		rightExpression = replaceUnary(rightExpression);
+		if (rightExpression.equals(null)) return;
+
+		// Add () to outside if they don't exist. This is required for the recursive call
+		// the later functions parse everything based on the ()
+		leftExpression = addParentheses(leftExpression);
+		if (leftExpression == null) return;
+		rightExpression = addParentheses(rightExpression);
+		if (rightExpression == null) return;
+
+		// replace expression inside innermost (), call recursively
+		// this will return the answer as a string
+		leftExpression = recursiveReduce(leftExpression,xValue);
+		if (leftExpression.equals(null)) return;
+		rightExpression = recursiveReduce(rightExpression,xValue);
+		if (rightExpression.equals(null)) return;
+
+		if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
+			// print expression + answer
+			resultTF.setText("Correct!");
+			logTextArea.append(origExpression + " is correct at x= " + xValue + newLine);
+		}
+		else{
+			// print expression + answer
+			resultTF.setText("Oops!");
+			logTextArea.append(leftExpression + "     " + rightExpression + newLine);
+			logTextArea.append(origExpression + " is incorrect at x= " + xValue + newLine);
+		}
+		
+		
 	}
 	
 	/*
@@ -354,7 +440,7 @@ public class ExpressionCalculator implements ActionListener {
         String inputString = inputBD.toPlainString();
 
         // set values to GUI
-        totalTF.setText(totalString);
+        resultTF.setText(totalString);
         logTextArea.append(previousTotalString + " + " + inputString + " = " + totalString + newLine);
         amountTF.setText(" ");
     }
@@ -407,6 +493,46 @@ public class ExpressionCalculator implements ActionListener {
 			expression = expression.replace("Pi","pi");
 
 		return expression;
+	}
+	
+	/*
+	This function reads in the input expression from field and parses it
+	 */
+	private String[] readTestExpression()
+	{
+		String expression = amountTF.getText();
+		String[] expressionArray = {null,null};
+
+		if (expression.length() == 0) {
+			errorTF.setText("Input an expression");
+			return expressionArray;
+		}
+
+		// set expression to known values
+		if (expression.contains("=")) {
+			// get left and right side of expression
+			//leftExpression = expression.split("=")[0];
+			//rightExpression = expression.split("=")[1];
+			
+			// set expression to known values
+			if (expression.contains("R")) // replace R with r
+				expression = expression.replace("R", "r");
+			if (expression.contains("X"))
+				expression = expression.replace("X", "x");
+			if (expression.contains("E"))
+				expression = expression.replace("E", "e");
+			if (expression.contains("PI"))
+				expression = expression.replace("PI", "pi");
+			if (expression.contains("Pi"))
+				expression = expression.replace("Pi","pi");
+			expressionArray = expression.split("=");
+		}
+		else{
+			errorTF.setText("Improper format: Does not contain \"=\".");
+		}
+		
+
+		return expressionArray;
 	}
 
 	/*
