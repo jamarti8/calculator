@@ -31,6 +31,8 @@ public class ExpressionCalculator implements ActionListener {
 	public boolean debug = false; //Use this to turn command line messages on/off
 	String calcMode = "accumulator"; // Default mode is accumulator
     String newLine  = System.lineSeparator();
+    int correctCount = 0;
+    int wrongCount = 0;
 
 	// GUI Objects
 	JPanel      mainPanel       = new JPanel();
@@ -196,6 +198,10 @@ public class ExpressionCalculator implements ActionListener {
 			resultTF.setText("00.00");
 			errorTF.setText("");
 			amountTF.setText("");
+			totalCorrectTF.setText("0");
+			correctCount = 0;
+			totalWrongTF.setText("0");
+			wrongCount = 0;
 		}
 		if (ae.getSource() == amountTF) {
 			if(calcMode == "accumulator") parseAccumulatorInput();
@@ -393,13 +399,16 @@ public class ExpressionCalculator implements ActionListener {
 		if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
 			// print expression + answer
 			resultTF.setText("Correct!");
-			logTextArea.append(origExpression + " is correct at x= " + xValue + newLine);
+			correctCount++;
+			totalCorrectTF.setText(Integer.toString(correctCount));
+			logTextArea.append(origExpression + " is correct at x= " + xValue + "(Total correct: "+correctCount+")"+ newLine);
 		}
 		else{
 			// print expression + answer
 			resultTF.setText("Oops!");
-			logTextArea.append(leftExpression + "     " + rightExpression + newLine);
-			logTextArea.append(origExpression + " is incorrect at x= " + xValue + newLine);
+			wrongCount++;
+			totalWrongTF.setText(Integer.toString(wrongCount));
+			logTextArea.append(origExpression + " is incorrect at x= " + xValue + "(Total wrong: "+wrongCount+")" + newLine);
 		}
 		
 		
