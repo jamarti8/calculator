@@ -56,11 +56,15 @@ public class ExpressionCalculator implements ActionListener {
 	JPanel 		labelPanel 		= new JPanel();
 	JPanel 		totalPanel 		= new JPanel();
 	JPanel 		errorPanel 		= new JPanel();
+	JPanel 		enterPanel 		= new JPanel();
+	JPanel 		xInputPanel		= new JPanel();
 	JScrollPane logTextScroll 	= new JScrollPane(logTextArea);
 	GridLayout 	oneByThree 		= new GridLayout(1,3); // rows, cols
 	GridLayout 	oneByTwo 		= new GridLayout(1,2);
 	GridLayout 	twoByOne 		= new GridLayout(2,1);
+	GridLayout oneByOne			= new GridLayout(1,1);
 	GroupLayout gLayoutTotal 	= new GroupLayout(upperTopPanel);
+	GroupLayout gLayoutEnter	= new GroupLayout(enterPanel);
 	static double value = 0;
 	
 	JMenuBar    menuBar         = new JMenuBar();
@@ -99,14 +103,30 @@ public class ExpressionCalculator implements ActionListener {
 	    errorPanel.add(errorLabel);
 	    errorPanel.add(errorTF);
 
-		errorPanel.add(xInputLabel);
-		errorPanel.add(xInputTF);
-		xInputLabel.show(false);
-		xInputTF.show(false);
+		//errorPanel.add(xInputLabel);
+		//errorPanel.add(xInputTF);
+		//xInputLabel.show(false);
+		//xInputTF.show(false);
 
 		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
-        lowerTopPanel.add(enterLabel);
-	    lowerTopPanel.add(amountTF);  
+		enterPanel.add(enterLabel);
+		gLayoutEnter.setVerticalGroup(
+				   gLayoutEnter.createSequentialGroup()
+				      .addGroup(gLayoutEnter.createParallelGroup(GroupLayout.Alignment.BASELINE)
+				           .addComponent(enterLabel)
+				           .addComponent(xInputPanel)
+				      )
+				);
+		xInputPanel.add(xInputLabel);
+		xInputPanel.add(xInputTF);
+		xInputPanel.setVisible(false);
+		//enterPanel.setLayout(oneByOne);
+		xInputPanel.setLayout(new FlowLayout());
+		
+		
+		lowerTopPanel.add(enterPanel);
+        lowerTopPanel.add(amountTF);
+	    
 	    mainPanel.add(logTextScroll); // Add logTextScroll to bottom of mainPanel
 
 		// Set attributes of the GUI objects
@@ -161,8 +181,7 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		if (ae.getSource() == itemAccumulator) {
 			calcMode = "accumulator";
-			xInputLabel.show(false);
-			xInputTF.show(false);
+			xInputPanel.setVisible(false);
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
 								"<br> Enter only 2 decimal places." +
@@ -171,8 +190,9 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemExpression) {
 			calcMode = "expression";
 			// show x= box
-			xInputLabel.show(true);
-			xInputTF.show(true);
+			//xInputLabel.show(true);
+			//xInputTF.show(true);
+			xInputPanel.setVisible(true);
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>ENTER INSTRUCTIONS HERE " +
 								"<br> MORE INSTRUCTIONS" +
@@ -286,6 +306,7 @@ public class ExpressionCalculator implements ActionListener {
 		if (expression.equals(null)) return;
 
 		// print expression + answer
+		totalTF.setText(expression.toString());
 		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
 	}
 	
