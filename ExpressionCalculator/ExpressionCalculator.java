@@ -213,28 +213,31 @@ public class ExpressionCalculator implements ActionListener {
 			calcMode = "accumulator";
 			xInputPanel.setVisible(false);
 			correctPanel.setVisible(false);
+			resultTF.setText("00.00");
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
-								"<br> Enter only 2 decimal places." +
-								"<br> You can enter a $ at the start if desired.</html>");
+								"<br>Enter only 2 decimal places." +
+								"<br>You can enter a $ at the start if desired.</html>");
 		}
 		if (ae.getSource() == itemExpression) {
 			calcMode = "expression";
 			xInputPanel.setVisible(true);
 			correctPanel.setVisible(false);
+			resultTF.setText("0");
 			calcWindow.setTitle("Calculator: Expression Mode");
-			enterLabel.setText("<html><b>Expression Mode</b><br>ENTER INSTRUCTIONS HERE " +
-								"<br> MORE INSTRUCTIONS" +
-								"<br> MORE INSTRUCTIONS </html>");
+			enterLabel.setText("<html><b>Expression Mode</b><br>Enter expression to calculate result: " +
+								"<br>Enter value for \"x\" below" +
+								"<br>Do not use implicit multiplication. </html>");
 		}
 		if (ae.getSource() == itemTest){
 			calcMode = "test";
 			xInputPanel.setVisible(true);
 			correctPanel.setVisible(true);
+			resultTF.setText("");
 			calcWindow.setTitle("Calculator: Test Mode");
-			enterLabel.setText("<html><b>Test Mode</b><br>ENTER INSTRUCTIONS HERE " +
-								"<br> MORE INSTRUCTIONS" +
-								"<br> MORE INSTRUCTIONS </html>");
+			enterLabel.setText("<html><b>Test Mode</b><br>Enter statement to check if true:" +
+								"<br>Example: (2+3)=(2x+1)" +
+								"<br>Total correct and wrong will be counted. </html>");
 		}
 		if (ae.getSource() == itemGraph){
 			calcMode = "graph";
