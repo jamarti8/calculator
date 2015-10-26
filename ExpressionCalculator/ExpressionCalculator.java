@@ -15,6 +15,8 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
+import java.util.regex.Pattern;
+
 import javax.swing.*;
 
 import static java.lang.Math.*;
@@ -158,11 +160,11 @@ public class ExpressionCalculator implements ActionListener {
 		resultLabel.setFont(new Font("default", Font.BOLD, 20));
 		resultTF.setFont(new Font("default", Font.PLAIN, 25));
 		resultTF.setEditable(false);
-		resultTF.setColumns(17);
+		resultTF.setColumns(25);
 		resultTF.setText("00.00");
 		errorTF.setFont(new Font("default", Font.PLAIN, 25));
 		errorTF.setEditable(false);
-		errorTF.setColumns(17);
+		errorTF.setColumns(25);
 		totalCorrectTF.setText("0");
 		totalCorrectTF.setHorizontalAlignment(JTextField.CENTER);
 		totalWrongTF.setText("0");
@@ -344,17 +346,13 @@ public class ExpressionCalculator implements ActionListener {
 		}
 
 
+//		BigDecimal  value = new BigDecimal(expression,MathContext.DECIMAL64);//set precision to 16 digits
+//        value = value.setScale(8,BigDecimal.ROUND_UP);//scale (8) is # of digits to right of decimal point.
+		// print expression + answer
+		resultTF.setText(expression.toString());
+		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
+	}
 
-		// print expression + answer
-		resultTF.setText(expression.toString());
-		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
-	}
-	
-	private void printAnswer(String expression, String origExpression, Double xValue){
-		// print expression + answer
-		resultTF.setText(expression.toString());
-		logTextArea.append(origExpression + " = " + expression + " at x= " + xValue + newLine);
-	}
 	/*
 	 * Test mode:
     This method parses works exactly the same as the expression input BUT it checks the input expression for
@@ -413,8 +411,10 @@ public class ExpressionCalculator implements ActionListener {
 		{
 			return;
 		}
+		leftExpression = leftExpression.replace(leftExpression.charAt(leftExpression.length()-1), ' ').trim();
+		//rightExpression = rightExpression.replace(rightExpression.charAt(rightExpression.length()-1), ' ').trim();
 
-		if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
+        if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
 			// print expression + answer
 			resultTF.setText("Correct!");
 			correctCount++;
@@ -614,9 +614,21 @@ public class ExpressionCalculator implements ActionListener {
 
 	private boolean stringContainsIllegalCharacters(String expression)
 	{
+		StringBuffer temp = new StringBuffer(expression);
+		System.out.println("EXPRESSION:" + expression);
 		// check if expression has things not numbers or allowed values
-		if (expression.matches("[0-9]+"))
-			return true;
+		for(int i=0;i<temp.length();i++){
+			if (Character.isLetter(temp.charAt(i)) && temp.charAt(i)!='x' && temp.charAt(i)!='r' && temp.charAt(i)!='e'){
+				if(temp.charAt(i)=='p' && temp.charAt(i+1)=='i' ){
+					i++;
+				}
+				else{
+					System.out.println("LETTER MATCHED.\n");
+					return true;
+				}
+				
+			}
+		}	
 
 		//for(int i = 0; i < expression.length(); i++)
 		//{
@@ -674,9 +686,7 @@ public class ExpressionCalculator implements ActionListener {
 		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
 		StringBuffer temp = new StringBuffer(expression);
 
-		System.out.println(expression.length());
 		if(expression.length()==1){
-			System.out.println("Length is 1.");
 			expression = "("+expression;
 			expression = expression+")";
 			return expression;
