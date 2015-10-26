@@ -783,7 +783,7 @@ public class ExpressionCalculator implements ActionListener {
 			return null;
 		}
 		expression = replaceUnary(expression); // need to fix new string if unary characters are present
-		System.out.println("Expression after replacement " + expression);
+		System.out.println("Expression after replacement: " + expression);
 
 		// while there are still ( present, keep calling the recursive reduce
 		if (openCount > 1)
@@ -791,8 +791,13 @@ public class ExpressionCalculator implements ActionListener {
 			expression = recursiveReduce(expression,xValue);
 		}
 
-		if (expression.equals(Double.toString(xValue)))
+		if (expression.equals("x")) {
 			expression = Double.toString(xValue);
+		}
+		if (expression.equals("ux")){
+			System.out.println("checked -x");
+			expression = Double.toString(-xValue);
+		}
 
 		return expression;
 
