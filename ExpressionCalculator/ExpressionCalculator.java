@@ -592,8 +592,10 @@ public class ExpressionCalculator implements ActionListener {
 			case "-": return left - right;
 			case "*": return left*right;
 			case "/":
-				if (right.equals(0.0))
+				if (right.equals(0.0)) {
+					errorTF.setText("divide by 0 is a result");
 					return null;
+				}
 				return left/right;
 			case "^": return pow(left,right);
 			case "r": return pow(left, (1.0/right)); // evaluates roots
@@ -607,13 +609,13 @@ public class ExpressionCalculator implements ActionListener {
 	private boolean stringContainsIllegalCharacters(String expression)
 	{
 		// check if expression has things not numbers or allowed values
+		if (expression.matches("[0-9]+"))
+			return true;
 
-		if(!expression.contains("+") && !expression.contains("-") && !expression.contains("*") && !expression.contains("/") && !expression.contains("r") && !expression.contains("^") && !expression.contains("u") && !expression.contains("x")){
-			for (int i = 0; i < expression.length(); i++) {
-				if (!Character.isDigit(expression.charAt(i)));
-				return true;
-			}
-		}
+		//for(int i = 0; i < expression.length(); i++)
+		//{
+		//	if (expression.charAt(i).matches("[0-9]+"))
+		//}
 		return false;
 
 	}
@@ -639,7 +641,7 @@ public class ExpressionCalculator implements ActionListener {
 		else if (expression.contains("r-"))
 			expression = expression.replace("r-", "ru");
 		if (expression.startsWith("-"))
-			expression = expression.replaceFirst("-","u");
+			expression = expression.replaceFirst("-", "u");
 		return expression;
 
 	}
@@ -665,12 +667,66 @@ public class ExpressionCalculator implements ActionListener {
 		}
 
 		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
+		/*StringBuffer temp = new StringBuffer(expression);
 
+		for (int i = 0; i < temp.length(); i++)
+		{
+			// Insert '*' where necessary (Java doesn't support implied multiplication)
+			if (temp.charAt(i) == '(' &&
+					(i - 1 != -1 &&
+							(i > 0 && (temp.charAt(i - 1) >= '0' &&
+									temp.charAt(i - 1) <= '9') ||
+									temp.charAt(i - 1) == ')')))
+			{
+				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+				return null;
+				//temp.insert(i, '*');
+				//i++;
+			}
+			else if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i-1)) || Character.isDigit(temp.charAt(i+1))) ){
+				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+				return null;
+			}
+			else if(temp.charAt(i) == 'x' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+				return null;
+			}
+			else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x') ){
+				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+				return null;
+			}
+			else if(temp.charAt(i) == ')' && (temp.charAt(i+1)=='x') ){
+				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+				return null;
+			}
+
+		}
+		expression = temp.toString();*/
 
 		expression = "("+expression;
 		expression = expression+")";
 		return expression;
 	}
+	/*
+	private String addParentheses(String expression)
+	{
+		if(expression.startsWith(")")) {
+			errorTF.setText("error in parentheses");
+			return null;
+		}
+
+		if(expression.endsWith("(")) {
+			errorTF.setText("error in parentheses");
+			return null;
+		}
+
+		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
+
+
+		expression = "("+expression;
+		expression = expression+")";
+		return expression;
+	} */
 
 	private String recursiveReduce(String expression, Double xValue)
 	{
@@ -719,6 +775,7 @@ public class ExpressionCalculator implements ActionListener {
 			expression = expression.replace("(","");
 		if (expression.endsWith(")"))
 			expression = expression.replace(")","");
+		expression = replaceUnary(expression);
 		System.out.println("eval expression: " + expression + " with give x value = " + xValue);
 
 		// split input expression inside () into an array of operators and operands
@@ -741,7 +798,7 @@ public class ExpressionCalculator implements ActionListener {
 		// checks that the number of operators is correct
 		if (operatorList.size() >= operandList.size())
 		{
-			errorTF.setText("Too many operators"); // this will be messed up if the unary operation is not correct
+			errorTF.setText("Error with operators"); // this will be messed up if the unary operation is not correct
 			return null;
 		}
 
