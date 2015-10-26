@@ -580,7 +580,15 @@ public class ExpressionCalculator implements ActionListener {
 			leftString = leftString.replace("u","-"); // unary indicator for negative number
 			left = Double.parseDouble(leftString);
 		}
-		else left = Double.parseDouble(leftString);
+		else {
+			try{
+				left = Double.parseDouble(leftString);
+			}
+			catch(NumberFormatException nfe){
+				errorTF.setText("Illegal character.");
+				return null;
+			}
+		}
 
 		if(rightString.contains("ux")) right = -xValue;
 		else if(rightString.contains("x")) right = xValue;
@@ -619,7 +627,7 @@ public class ExpressionCalculator implements ActionListener {
 		// check if expression has things not numbers or allowed values
 		for(int i=0;i<temp.length();i++){
 			if (Character.isLetter(temp.charAt(i)) && temp.charAt(i)!='x' && temp.charAt(i)!='r' && temp.charAt(i)!='e'){
-				if(temp.charAt(i)=='p' && temp.charAt(i+1)=='i' ){
+				if(temp.charAt(i)=='p' && i!=(temp.length()-1) && temp.charAt(i+1)=='i'){
 					i++;
 				}
 				else{
