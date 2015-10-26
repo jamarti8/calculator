@@ -335,8 +335,11 @@ public class ExpressionCalculator implements ActionListener {
 
 		// replace expression inside innermost (), call recursively
 		// this will return the answer as a string
-		expression = recursiveReduce(expression, xValue);
-		if (expression.equals(null)) return;
+		try {
+			expression = recursiveReduce(expression, xValue);
+		} catch (NullPointerException npe) {
+			return;
+		}
 
 		// return - sign if required
 		expression = returnUnary(expression);
@@ -400,13 +403,15 @@ public class ExpressionCalculator implements ActionListener {
 
 		// replace expression inside innermost (), call recursively
 		// this will return the answer as a string
-		leftExpression = recursiveReduce(leftExpression,xValue);
-		if (leftExpression.equals(null)) return;
-		rightExpression = recursiveReduce(rightExpression,xValue);
-		if (rightExpression.equals(null)) return;
-
-		rightExpression = returnUnary(rightExpression);
-		leftExpression = returnUnary(leftExpression);
+		try {
+			leftExpression = recursiveReduce(leftExpression, xValue);
+			rightExpression = recursiveReduce(rightExpression, xValue);
+			rightExpression = returnUnary(rightExpression);
+			leftExpression = returnUnary(leftExpression);
+		} catch(NullPointerException npe)
+		{
+			return;
+		}
 
 		if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
 			// print expression + answer
@@ -666,8 +671,9 @@ public class ExpressionCalculator implements ActionListener {
 			return null;
 		}
 
+		/*
 		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
-		/*StringBuffer temp = new StringBuffer(expression);
+		StringBuffer temp = new StringBuffer(expression);
 
 		for (int i = 0; i < temp.length(); i++)
 		{
@@ -683,50 +689,69 @@ public class ExpressionCalculator implements ActionListener {
 				//temp.insert(i, '*');
 				//i++;
 			}
-			else if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i-1)) || Character.isDigit(temp.charAt(i+1))) ){
-				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-				return null;
+			else if(i==0){
+				if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i+1))) ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == 'x' && (temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == '(' && (temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == ')' && (temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
 			}
-			else if(temp.charAt(i) == 'x' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
-				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-				return null;
+			else if(i>0 && i<(temp.length()-1)){
+				if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i-1)) || Character.isDigit(temp.charAt(i+1))) ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == 'x' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == ')' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
 			}
-			else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x') ){
-				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-				return null;
-			}
-			else if(temp.charAt(i) == ')' && (temp.charAt(i+1)=='x') ){
-				errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-				return null;
+			else if(i==temp.length()-1){
+				if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i-1))) ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == 'x' && (temp.charAt(i-1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x') ){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
+				else if(temp.charAt(i) == ')' && (temp.charAt(i-1)=='x')){
+					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
+					return null;
+				}
 			}
 
+
 		}
-		expression = temp.toString();*/
+		expression = temp.toString(); */
 
 		expression = "("+expression;
 		expression = expression+")";
 		return expression;
 	}
-	/*
-	private String addParentheses(String expression)
-	{
-		if(expression.startsWith(")")) {
-			errorTF.setText("error in parentheses");
-			return null;
-		}
-
-		if(expression.endsWith("(")) {
-			errorTF.setText("error in parentheses");
-			return null;
-		}
-
-		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
-
-
-		expression = "("+expression;
-		expression = expression+")";
-		return expression;
-	} */
 
 	private String recursiveReduce(String expression, Double xValue)
 	{
@@ -749,11 +774,15 @@ public class ExpressionCalculator implements ActionListener {
 		// substring of last () set
 		String subString = expression.substring(lastOpen, matchingClose + 1);
 		System.out.println("Program will evaluate this substring: " + subString);
-		String newString = evalExpression(subString, xValue);
-		if(newString.equals(null)) return null;
-		System.out.println("returned string after evaluation" + newString);
-
-		expression = expression.replace(subString,newString);
+		try {
+			String newString = evalExpression(subString, xValue);
+			System.out.println("returned string after evaluation" + newString);
+			expression = expression.replace(subString, newString);
+		} catch (NullPointerException npe)
+		{
+			System.out.println("Divide by 0 in recursive");
+			return null;
+		}
 		expression = replaceUnary(expression); // need to fix new string if unary characters are present
 		System.out.println("Expression after replacement " + expression);
 
@@ -762,6 +791,9 @@ public class ExpressionCalculator implements ActionListener {
 		{
 			expression = recursiveReduce(expression,xValue);
 		}
+
+		if (expression.equals(Double.toString(xValue)))
+			expression = Double.toString(xValue);
 
 		return expression;
 
@@ -820,10 +852,16 @@ public class ExpressionCalculator implements ActionListener {
 					if ((operatorList.get(i).equals("*")) || (operatorList.get(i).equals("/"))) {
 						System.out.println("found * or /");
 						// this does not work
-						if (Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)).equals(null))
+						try {
+							String temp = Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue));
+							operandList.set(i, temp);
+						} catch (NullPointerException npe) {
 							System.out.println("divide by 0");
+							errorTF.setText("Divide by 0");
+							return null;
+						}
 						// does not properly check for null return
-						operandList.set(i, Double.toString(evaluateSimpleExpression(operandList.get(i), operatorList.get(i), operandList.get(i + 1), xValue)));
+
 						operatorList.remove(i);
 						operandList.remove(i + 1); // shorten list by 1
 						i--;
