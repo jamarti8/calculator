@@ -335,8 +335,11 @@ public class ExpressionCalculator implements ActionListener {
 
 		// replace expression inside innermost (), call recursively
 		// this will return the answer as a string
-		expression = recursiveReduce(expression,xValue);
+		expression = recursiveReduce(expression, xValue);
 		if (expression.equals(null)) return;
+
+		// return - sign if required
+		expression = returnUnary(expression);
 
 		// print expression + answer
 		resultTF.setText(expression.toString());
@@ -392,12 +395,18 @@ public class ExpressionCalculator implements ActionListener {
 		rightExpression = addParentheses(rightExpression);
 		if (rightExpression == null) return;
 
+		System.out.println("left side: " + leftExpression);
+		System.out.println("right side: "+ rightExpression);
+
 		// replace expression inside innermost (), call recursively
 		// this will return the answer as a string
 		leftExpression = recursiveReduce(leftExpression,xValue);
 		if (leftExpression.equals(null)) return;
 		rightExpression = recursiveReduce(rightExpression,xValue);
 		if (rightExpression.equals(null)) return;
+
+		rightExpression = returnUnary(rightExpression);
+		leftExpression = returnUnary(leftExpression);
 
 		if (Double.parseDouble(leftExpression) == Double.parseDouble(rightExpression)){
 			// print expression + answer
@@ -599,12 +608,19 @@ public class ExpressionCalculator implements ActionListener {
 	{
 		// check if expression has things not numbers or allowed values
 
-		return false; // no illegals
+		if(!expression.contains("+") && !expression.contains("-") && !expression.contains("*") && !expression.contains("/") && !expression.contains("r") && !expression.contains("^") && !expression.contains("u") && !expression.contains("x")){
+			for (int i = 0; i < expression.length(); i++) {
+				if (!Character.isDigit(expression.charAt(i)));
+				return true;
+			}
+		}
+		return false;
+
 	}
 
 	private String replaceUnary(String expression)
 	{
-
+		expression = expression.trim();
 		if (expression.contains("+-")){
 			expression = expression.replace("+-", "+u");
 		}
@@ -622,8 +638,18 @@ public class ExpressionCalculator implements ActionListener {
 		}
 		else if (expression.contains("r-"))
 			expression = expression.replace("r-", "ru");
+		if (expression.startsWith("-"))
+			expression = expression.replaceFirst("-","u");
 		return expression;
 
+	}
+
+	// replace possible u at end with -
+	private String returnUnary(String expression)
+	{
+		if(expression.contains("u"))
+			expression = expression.replace("u","-");
+		return expression;
 	}
 
 	private String addParentheses(String expression)
