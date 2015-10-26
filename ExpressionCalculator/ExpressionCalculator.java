@@ -187,8 +187,8 @@ public class ExpressionCalculator implements ActionListener {
         itemGraph.addActionListener(this);
 
 		// Show the window
-	    calcWindow.setSize(1000, 550);
-	    calcWindow.setMinimumSize(new Dimension(1000,550));
+	    calcWindow.setSize(1020, 550);
+	    calcWindow.setMinimumSize(new Dimension(950,550));
 	    calcWindow.setVisible(true); // show the graphics window
 	}
 
@@ -542,7 +542,7 @@ public class ExpressionCalculator implements ActionListener {
 			expressionArray = expression.split("=");
 		}
 		else{
-			errorTF.setText("Improper format: Does not contain \"=\".");
+			errorTF.setText("Does not contain \"=\".");
 		}
 		
 
