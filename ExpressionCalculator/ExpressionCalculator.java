@@ -795,8 +795,14 @@ public class ExpressionCalculator implements ActionListener {
 			expression = Double.toString(xValue);
 		}
 		if (expression.equals("ux")){
-			System.out.println("checked -x");
+			//System.out.println("checked -x");
 			expression = Double.toString(-xValue);
+		}
+
+		if (expression.contains("*") || expression.contains("+") || expression.contains("/") || expression.contains("^") || expression.contains("r"))
+		{
+			errorTF.setText("possible issue with () ");
+			return null;
 		}
 
 		return expression;
