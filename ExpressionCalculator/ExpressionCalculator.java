@@ -624,7 +624,6 @@ public class ExpressionCalculator implements ActionListener {
 	private boolean stringContainsIllegalCharacters(String expression)
 	{
 		StringBuffer temp = new StringBuffer(expression);
-		System.out.println("EXPRESSION:" + expression);
 		// check if expression has things not numbers or allowed values
 		for(int i=0;i<temp.length();i++){
 			if (Character.isLetter(temp.charAt(i)) && temp.charAt(i)!='x' && temp.charAt(i)!='r' && temp.charAt(i)!='e'){
@@ -632,17 +631,11 @@ public class ExpressionCalculator implements ActionListener {
 					i++;
 				}
 				else{
-					System.out.println("LETTER MATCHED.\n");
 					return true;
 				}
 				
 			}
 		}	
-
-		//for(int i = 0; i < expression.length(); i++)
-		//{
-		//	if (expression.charAt(i).matches("[0-9]+"))
-		//}
 		return false;
 
 	}
