@@ -337,12 +337,13 @@ public class ExpressionCalculator implements ActionListener {
 		// this will return the answer as a string
 		try {
 			expression = recursiveReduce(expression, xValue);
+			// return - sign if required
+			expression = returnUnary(expression);
 		} catch (NullPointerException npe) {
 			return;
 		}
 
-		// return - sign if required
-		expression = returnUnary(expression);
+
 
 		// print expression + answer
 		resultTF.setText(expression.toString());
@@ -670,10 +671,16 @@ public class ExpressionCalculator implements ActionListener {
 			errorTF.setText("error in parentheses");
 			return null;
 		}
-
-		/*
 		// CHECK IF THERE IS IMPLICIT MULITIPLICATION
 		StringBuffer temp = new StringBuffer(expression);
+
+		System.out.println(expression.length());
+		if(expression.length()==1){
+			System.out.println("Length is 1.");
+			expression = "("+expression;
+			expression = expression+")";
+			return expression;
+		}
 
 		for (int i = 0; i < temp.length(); i++)
 		{
@@ -698,10 +705,6 @@ public class ExpressionCalculator implements ActionListener {
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
-				else if(temp.charAt(i) == '(' && (temp.charAt(i+1)=='x') ){
-					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-					return null;
-				}
 				else if(temp.charAt(i) == ')' && (temp.charAt(i+1)=='x') ){
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
@@ -716,37 +719,33 @@ public class ExpressionCalculator implements ActionListener {
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
-				else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+				else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x') ){
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
-				else if(temp.charAt(i) == ')' && (temp.charAt(i-1)=='x' || temp.charAt(i+1)=='x') ){
+				else if(temp.charAt(i) == ')' && (temp.charAt(i+1)=='x') ){
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
 			}
 			else if(i==temp.length()-1){
 				if(temp.charAt(i) == 'x' && (Character.isDigit(temp.charAt(i-1))) ){
+					System.out.println("#x");
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
 				else if(temp.charAt(i) == 'x' && (temp.charAt(i-1)=='x') ){
+					System.out.println("xx");
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
 				else if(temp.charAt(i) == '(' && (temp.charAt(i-1)=='x') ){
-					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
-					return null;
-				}
-				else if(temp.charAt(i) == ')' && (temp.charAt(i-1)=='x')){
+					System.out.println("x(");
 					errorTF.setText("Cannot multiply implicitly. Add \"*\".");
 					return null;
 				}
 			}
-
-
 		}
-		expression = temp.toString(); */
 
 		expression = "("+expression;
 		expression = expression+")";
