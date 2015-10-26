@@ -322,6 +322,7 @@ public class ExpressionCalculator implements ActionListener {
 		String origExpression = expression; // keep input version for log printing purposes
 
 		// NEEDS TO BE WRITTEN
+		//Francesco was here
 		if (stringContainsIllegalCharacters(expression))
 			errorTF.setText("Expression contains an illegal character");
 
