@@ -187,8 +187,8 @@ public class ExpressionCalculator implements ActionListener {
         itemGraph.addActionListener(this);
 
 		// Show the window
-	    calcWindow.setSize(990, 550);
-	    calcWindow.setMinimumSize(new Dimension(990,550));
+	    calcWindow.setSize(1000, 550);
+	    calcWindow.setMinimumSize(new Dimension(1000,550));
 	    calcWindow.setVisible(true); // show the graphics window
 	}
 
@@ -503,6 +503,8 @@ public class ExpressionCalculator implements ActionListener {
 			expression = expression.replace("PI", "pi");
 		if (expression.contains("Pi"))
 			expression = expression.replace("Pi","pi");
+		if (expression.contains(" "))
+			expression = expression.replace(" ", ""); // removes all white space
 
 		return expression;
 	}
@@ -602,9 +604,26 @@ public class ExpressionCalculator implements ActionListener {
 
 	private String replaceUnary(String expression)
 	{
-		//if (expression.contains())
 
+		if (expression.contains("+-")){
+			expression = expression.replace("+-", "+u");
+		}
+		else if (expression.contains("--")){
+			expression = expression.replace("--", "-u");
+		}
+		else if (expression.contains("*-")){
+			expression = expression.replace("*-", "*u");
+		}
+		else if (expression.contains("/-")){
+			expression = expression.replace("/-", "/u");
+		}
+		else if (expression.contains("^-")){
+			expression = expression.replace("^-", "^u");
+		}
+		else if (expression.contains("r-"))
+			expression = expression.replace("r-", "ru");
 		return expression;
+
 	}
 
 	private String addParentheses(String expression)
