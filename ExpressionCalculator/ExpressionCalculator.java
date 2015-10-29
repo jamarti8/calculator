@@ -16,9 +16,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import javax.swing.*;
-
 import static java.lang.Math.*;
 
 public class ExpressionCalculator implements ActionListener {
@@ -435,10 +433,32 @@ public class ExpressionCalculator implements ActionListener {
 	
 	/*
 	 * Graph mode:
-    This method parses the input and sends the clean properly formatted
-    decimal to the accumulate and print method.
+    This method parses the input expression the same as expression mode
+    but it creates an array of 10 or 11 x,y values use for plotting
      */
-	private void parseGraphInput() {
+	private void parseGraphInput()
+	{
+		double[] xValues = {1.0,2.0};
+		double[] yValues = {.0,4.0};
+		String origExpression = "testing";
+
+
+		// read in expression same as above
+
+		// read in start x value
+
+		// read in increment x value
+
+		// create array of 10/11 x values
+
+		// call expression to return array of y values
+
+		// pass x, y, and expression String to GraphPanel as constructor parameters
+
+		// create new graph panel class with parameters from gui
+		GraphPanel graph = new GraphPanel(origExpression,xValues,yValues,this);
+
+
 
 	}
 
