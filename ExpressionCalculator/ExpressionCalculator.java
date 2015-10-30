@@ -45,7 +45,8 @@ public class ExpressionCalculator implements ActionListener {
 	JTextField  errorTF      	= new JTextField(12);
 	JTextField  xInputTF		= new JTextField(12);
 	JTextField  totalCorrectTF	= new JTextField(12);
-	JTextField  totalWrongTF= new JTextField(12);
+	JTextField  xIncrementTF	= new JTextField(12);
+	JTextField  totalWrongTF	= new JTextField(12);
 	JLabel 		xInputLabel		= new JLabel("x = ");
 	JLabel 		resultLabel		= new JLabel("Result:");
 	JLabel 		errorLabel 		= new JLabel("Error:");
@@ -56,6 +57,7 @@ public class ExpressionCalculator implements ActionListener {
 	JLabel 		emptyLabel2 	= new JLabel("");
 	JLabel 		totalCorrectLabel = new JLabel("Total Correct:");
 	JLabel 		totalWrongLabel = new JLabel("Total Wrong:");
+	JLabel 		xIncrementLabel = new JLabel("x increment:");
 	JButton 	clearButton    	= new JButton("Clear");
 	JPanel 		upperTopPanel 	= new JPanel();
 	JPanel 		lowerTopPanel 	= new JPanel();
@@ -66,6 +68,7 @@ public class ExpressionCalculator implements ActionListener {
 	JPanel 		middleLeftPanel	= new JPanel();
 	JPanel 		correctPanel 	= new JPanel();
 	JPanel 		xInputPanel		= new JPanel();
+	JPanel 		xIncrementPanel	= new JPanel();
 	JScrollPane logTextScroll 	= new JScrollPane(logTextArea);
 	GridLayout 	oneByThree 		= new GridLayout(1,3); // rows, cols
 	GridLayout 	oneByTwo 		= new GridLayout(1,2);
@@ -115,7 +118,7 @@ public class ExpressionCalculator implements ActionListener {
 		
 		middleLeftPanel.setLayout(oneByTwo);
 		middleLeftPanel.add(enterPanel);
-		middleLeftPanel.add(correctPanel);
+
 		enterPanel.add(enterLabel);
 		gLayoutEnter.setVerticalGroup(
 				   gLayoutEnter.createSequentialGroup()
@@ -139,7 +142,10 @@ public class ExpressionCalculator implements ActionListener {
 		xInputPanel.add(xInputLabel);
 		xInputPanel.add(xInputTF);
 		xInputPanel.setVisible(false);
-		correctPanel.setVisible(false);
+		
+		xIncrementPanel.setLayout(new FlowLayout());
+		xIncrementPanel.add(xIncrementLabel);
+		xIncrementPanel.add(xIncrementTF);
 		
 		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
 		lowerTopPanel.add(middleLeftPanel);
@@ -212,7 +218,8 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemAccumulator) {
 			calcMode = "accumulator";
 			xInputPanel.setVisible(false);
-			correctPanel.setVisible(false);
+			middleLeftPanel.remove(correctPanel);
+			middleLeftPanel.remove(xIncrementPanel);
 			resultTF.setText("00.00");
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
@@ -222,7 +229,8 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemExpression) {
 			calcMode = "expression";
 			xInputPanel.setVisible(true);
-			correctPanel.setVisible(false);
+			middleLeftPanel.remove(correctPanel);
+			middleLeftPanel.remove(xIncrementPanel);
 			resultTF.setText("0");
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>Enter expression to calculate result: " +
@@ -232,7 +240,8 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemTest){
 			calcMode = "test";
 			xInputPanel.setVisible(true);
-			correctPanel.setVisible(true);
+			middleLeftPanel.add(correctPanel);
+			middleLeftPanel.remove(xIncrementPanel);
 			resultTF.setText("");
 			calcWindow.setTitle("Calculator: Test Mode");
 			enterLabel.setText("<html><b>Test Mode</b><br>Enter statement to check if true:" +
@@ -242,10 +251,12 @@ public class ExpressionCalculator implements ActionListener {
 		if (ae.getSource() == itemGraph){
 			calcMode = "graph";
 			xInputPanel.setVisible(true);
+			middleLeftPanel.remove(correctPanel);
+			middleLeftPanel.add(xIncrementPanel);
 			calcWindow.setTitle("Calculator: Graph Mode");
-			enterLabel.setText("<html><b>Graph Mode</b><br>ENTER INSTRUCTIONS HERE " +
-								"<br> MORE INSTRUCTIONS" +
-								"<br> MORE INSTRUCTIONS </html>");
+			enterLabel.setText("<html><b>Graph Mode</b><br>Enter x value and x increment value." +
+								"<br>Enter an expression to the right." +
+								"<br>Press enter to plot. </html>");
 		}
 	}
 
