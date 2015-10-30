@@ -319,13 +319,10 @@ public class ExpressionCalculator implements ActionListener {
 		String expression = readExpression();
 		String origExpression = expression; // keep input version for log printing purposes
 
-		// NEEDS TO BE WRITTEN
-		//Francesco was here
 		if (stringContainsIllegalCharacters(expression))
 			errorTF.setText("Expression contains an illegal character");
 
 		// replace unary operator (-) with (+u)
-		// NEEDS TO BE WRITTEN
 		expression = replaceUnary(expression);
 		if (expression.equals(null)) return;
 
@@ -514,6 +511,29 @@ public class ExpressionCalculator implements ActionListener {
 		// pass x, y, and expression String to GraphPanel as constructor parameters
 		// create new graph panel class with parameters from gui
 		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
+	}
+
+	public String valueFromExpression(String expression, double xValue) throws Exception
+	{
+		// replace unary operator (-) with (+u)
+		expression = replaceUnary(expression);
+		if (expression.equals(null)) throw new NullPointerException();
+
+		// Add () to outside if they don't exist. This is required for the recursive call
+		// the later functions parse everything based on the ()
+		expression = addParentheses(expression);
+		if (expression == null) throw new NullPointerException();
+
+		// replace expression inside innermost (), call recursively
+		// this will return the answer as a string
+		try {
+			expression = recursiveReduce(expression, xValue);
+			// return - sign if required
+			expression = returnUnary(expression);
+		} catch (NullPointerException npe) {
+			throw new NullPointerException();
+		}
+		return expression;
 	}
 
     /*

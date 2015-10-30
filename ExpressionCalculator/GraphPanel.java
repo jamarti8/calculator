@@ -20,10 +20,18 @@ public class GraphPanel extends JPanel implements MouseListener
         // To-dos for this constructor method:
         // 1 Verify arrays are same size
         System.out.println("X values to plot: " + Arrays.toString(xValues));
+        // this should be impossible to have, but...
+        if (xValues.length != yValues.length) return;
 
         // 2 Verify x increment is positive
+        if ((xValues[1] - xValues[0]) < 0) {
+            System.out.println("recieved x array has negative x increment value");
+            return;
+        }
         // 3 Save Calculator address for call back
+
         // 4 Save expression for call back
+
         // 5 Register with the panel as MouseListener
         // 6 Calculate Y scale values (and save them)
         // 7 Build miniXYdisplayWindow (reuse for each mouse click!)
@@ -48,7 +56,15 @@ public class GraphPanel extends JPanel implements MouseListener
         String xValueString = String.valueOf(xValue);
         xTextField.setText("X = " + xValueString);
 
-        String yValueString = calculator.calculate(expression,xValueString);
+        // can use this to calculate a specific y value
+        // NEED TO SAVE INSTANCE VARIABLE WITH CALCULATOR IN CONSTRUCTOR
+        try {
+            calculatorProgram.valueFromExpression(expression, xValues[0]);
+        } catch (NullPointerException npe) {
+            return;
+        }
+
+        String yValueString = calculator.(expression,xValueString);
         yTextField.setText("Y = " + yValueString);
 
         // show mini x,y display window
