@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 /**
  * Created by kevin on 29.10.15.
@@ -17,7 +19,8 @@ public class GraphPanel extends JPanel implements MouseListener
     {
         // To-dos for this constructor method:
         // 1 Verify arrays are same size
-        System.out.println("first x value: " + xValues[0]);
+        System.out.println("X values to plot: " + Arrays.toString(xValues));
+
         // 2 Verify x increment is positive
         // 3 Save Calculator address for call back
         // 4 Save expression for call back

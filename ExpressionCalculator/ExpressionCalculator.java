@@ -438,28 +438,82 @@ public class ExpressionCalculator implements ActionListener {
      */
 	private void parseGraphInput()
 	{
-		double[] xValues = {1.0,2.0};
-		double[] yValues = {.0,4.0};
-		String origExpression = "testing";
+		double[] xValues = new double[11];
+		double[] yValues = new double[11];
 
+		errorTF.setText(" "); // clear error each time calculate is pressed
+		// clear text area if first time pressed
+		if (logTextArea.getText().contains("Log text will go here"))
+		{
+			logTextArea.setText("");
+		}
 
-		// read in expression same as above
+		// read input x value
+		Double startX = readXValue();
+		if (startX.equals(null)) return;
+		System.out.println("X value is: " + startX);
 
-		// read in start x value
+		// read x increment value
+		Double xIncrement = 1.0;
 
-		// read in increment x value
+		// read input expression
+		String expression = readExpression();
+		String origExpression = expression; // keep input version for log printing purposes
 
-		// create array of 10/11 x values
+		if (stringContainsIllegalCharacters(expression))
+			errorTF.setText("Expression contains an illegal character");
 
-		// call expression to return array of y values
+		// replace unary operator (-) with (+u)
+		expression = replaceUnary(expression);
+		if (expression.equals(null)) return;
+
+		// Add () to outside if they don't exist. This is required for the recursive call
+		// the later functions parse everything based on the ()
+		expression = addParentheses(expression);
+		if (expression == null) return;
+
+		// setup for loop to find all X values
+		xValues[0] = startX;
+		for (int i = 1; i < 11; i++)
+		{
+			xValues[i] = xValues[i-1] + xIncrement;
+		}
+		System.out.println("X values: " + Arrays.toString(xValues));
+
+		// set up for loop based on X values
+		String temp;
+		for (int i = 0; i<11; i++) {
+			try {
+				temp = recursiveReduce(expression, xValues[i]);
+				// return - sign if required
+				temp = returnUnary(temp);
+				try {
+					yValues[i] = Double.parseDouble(temp);
+				} catch (NumberFormatException nfe) {
+					return;
+				}
+			} catch (NullPointerException npe) {
+				return;
+			}
+		}
+
+		System.out.println("Y values: " + Arrays.toString(yValues));
+		double[] xValuesToPass;
+		double[] yValuesToPass;
+		if ((xValues[0] < 0 && xValues[10] < 0) || (xValues[0] >= 0 && xValues[10] > 0))
+		{
+			System.out.println("only need 10 digits in array");
+			xValuesToPass = Arrays.copyOf(xValues,10);
+			yValuesToPass = Arrays.copyOf(yValues,10);
+			//System.out.println(Arrays.toString(xValuesToPass));
+		} else {
+			xValuesToPass = Arrays.copyOf(xValues,11);
+			yValuesToPass = Arrays.copyOf(yValues,11);
+		}
 
 		// pass x, y, and expression String to GraphPanel as constructor parameters
-
 		// create new graph panel class with parameters from gui
-		GraphPanel graph = new GraphPanel(origExpression,xValues,yValues,this);
-
-
-
+		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
 	}
 
     /*
