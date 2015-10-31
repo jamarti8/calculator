@@ -1,3 +1,10 @@
+/*
+ECE 309 Lab 11 by Team 18
+Kevin Keller
+Francesco Palermo
+Justin Martin
+ */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -11,7 +18,6 @@ import java.util.Arrays;
 
 public class GraphPanel extends JPanel implements MouseListener
 {
-	JFrame      graphWindow      = new JFrame();
 	
     public GraphPanel (String     expression, // CONSTRUCTOR
                        double[]   xValues,

@@ -29,6 +29,7 @@ public class Calculator implements ActionListener {
 	}
 	
 	public boolean debug = false; //Use this to turn command line messages on/off
+	static double value = 0;
 	String calcMode = "accumulator"; // Default mode is accumulator
     String newLine  = System.lineSeparator();
     int correctCount = 0;
@@ -51,8 +52,8 @@ public class Calculator implements ActionListener {
 	JLabel 		resultLabel		= new JLabel("Result:");
 	JLabel 		errorLabel 		= new JLabel("Error:");
     JLabel      enterLabel      = new JLabel("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
-            "<br> Enter only 2 decimal places." +
-            "<br> You can enter a $ at the start if desired.</html>");
+            								"<br> Enter only 2 decimal places." +
+            								"<br> You can enter a $ at the start if desired.</html>");
 	JLabel 		emptyLabel 		= new JLabel("");
 	JLabel 		emptyLabel2 	= new JLabel("");
 	JLabel 		totalCorrectLabel = new JLabel("Total Correct:");
@@ -77,14 +78,14 @@ public class Calculator implements ActionListener {
 	GroupLayout gLayoutTotal 	= new GroupLayout(upperTopPanel);
 	GroupLayout gLayoutEnter	= new GroupLayout(enterPanel);
 	GroupLayout gLayoutCorrect  = new GroupLayout(correctPanel);
-	static double value = 0;
-	
 	JMenuBar    menuBar         = new JMenuBar();
 	JMenu       pullDownMenu    = new JMenu("Mode");
 	JMenuItem   itemAccumulator = new JMenuItem("Accumulator");
 	JMenuItem   itemExpression = new JMenuItem("Expression");
 	JMenuItem   itemTest = new JMenuItem("Test");
-	JMenuItem   itemGraph = new JMenuItem("Graph");	
+	JMenuItem   itemGraph = new JMenuItem("Graph");
+		// Graph window
+	JFrame      graphWindow      = new JFrame();
 	
 	public Calculator() {
 		// Add GUI-build code here.
@@ -114,11 +115,8 @@ public class Calculator implements ActionListener {
 	    errorPanel.setLayout(new FlowLayout());
 	    errorPanel.add(errorLabel);
 	    errorPanel.add(errorTF);
-
-		
 		middleLeftPanel.setLayout(oneByTwo);
 		middleLeftPanel.add(enterPanel);
-
 		enterPanel.add(enterLabel);
 		gLayoutEnter.setVerticalGroup(
 				   gLayoutEnter.createSequentialGroup()
@@ -143,16 +141,15 @@ public class Calculator implements ActionListener {
 		xInputPanel.add(xInputTF);
 		xInputPanel.setVisible(false);
 		
-		xIncrementPanel.setLayout(new FlowLayout());
-		xIncrementPanel.add(xIncrementLabel);
-		xIncrementPanel.add(xIncrementTF);
-		
 		lowerTopPanel.setLayout(oneByTwo); //Add items to lowerTopPanel
 		lowerTopPanel.add(middleLeftPanel);
         lowerTopPanel.add(amountTF);
-	    
 	    mainPanel.add(logTextScroll); // Add logTextScroll to bottom of mainPanel
-
+	    	// Graph window
+	    xIncrementPanel.setLayout(new FlowLayout());
+		xIncrementPanel.add(xIncrementLabel);
+		xIncrementPanel.add(xIncrementTF);
+		
 		// Set attributes of the GUI objects
 	    mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 	    oneByThree.setHgap(30);
@@ -220,6 +217,8 @@ public class Calculator implements ActionListener {
 			xInputPanel.setVisible(false);
 			middleLeftPanel.remove(correctPanel);
 			middleLeftPanel.remove(xIncrementPanel);
+			middleLeftPanel.revalidate();
+			middleLeftPanel.repaint();
 			resultTF.setText("00.00");
 			calcWindow.setTitle("Calculator: Accumulator Mode");
 			enterLabel.setText("<html><b>Accumulator Mode</b><br>Enter value to be added to sum: " +
@@ -231,6 +230,8 @@ public class Calculator implements ActionListener {
 			xInputPanel.setVisible(true);
 			middleLeftPanel.remove(correctPanel);
 			middleLeftPanel.remove(xIncrementPanel);
+			middleLeftPanel.revalidate();
+			middleLeftPanel.repaint();
 			resultTF.setText("0");
 			calcWindow.setTitle("Calculator: Expression Mode");
 			enterLabel.setText("<html><b>Expression Mode</b><br>Enter expression to calculate result: " +
@@ -240,8 +241,10 @@ public class Calculator implements ActionListener {
 		if (ae.getSource() == itemTest){
 			calcMode = "test";
 			xInputPanel.setVisible(true);
-			middleLeftPanel.add(correctPanel);
 			middleLeftPanel.remove(xIncrementPanel);
+			middleLeftPanel.add(correctPanel);
+			middleLeftPanel.revalidate();
+			middleLeftPanel.repaint();
 			resultTF.setText("");
 			calcWindow.setTitle("Calculator: Test Mode");
 			enterLabel.setText("<html><b>Test Mode</b><br>Enter statement to check if true:" +
@@ -253,6 +256,9 @@ public class Calculator implements ActionListener {
 			xInputPanel.setVisible(true);
 			middleLeftPanel.remove(correctPanel);
 			middleLeftPanel.add(xIncrementPanel);
+			middleLeftPanel.revalidate();
+			middleLeftPanel.repaint();			
+			resultTF.setText("");
 			calcWindow.setTitle("Calculator: Graph Mode");
 			enterLabel.setText("<html><b>Graph Mode</b><br>Enter x value and x increment value." +
 								"<br>Enter an expression to the right." +
@@ -523,7 +529,12 @@ public class Calculator implements ActionListener {
 		// pass x, y, and expression String to GraphPanel as constructor parameters
 		// create new graph panel class with parameters from gui
 		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
+		// Show the graph window
+		graphWindow.add(graph);
+	    calcWindow.setSize(1020, 550);
+	    calcWindow.setVisible(true); // show the graphics window
 	}
+	
 
 	public String valueFromExpression(String expression, double xValue) throws Exception
 	{
