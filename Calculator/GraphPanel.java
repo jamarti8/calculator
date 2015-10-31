@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.Collections;
+import com.sun.xml.internal.bind.v2.model.util.ArrayInfoUtil;
 
 /**
  * Created by kevin on 29.10.15.
@@ -18,6 +20,12 @@ import java.util.Arrays;
 
 public class GraphPanel extends JPanel implements MouseListener
 {
+	double[] xValuesArray;
+	double[] yValuesArray;
+	double[] yScaleValuesArray;
+	Calculator calcProgram;
+	String expressionString;
+	double[] yAxisValues;
 	
     public GraphPanel (String     expression, // CONSTRUCTOR
                        double[]   xValues,
@@ -37,11 +45,36 @@ public class GraphPanel extends JPanel implements MouseListener
             return;
         }
         // 3 Save Calculator address for call back
-
+        calcProgram = calculatorProgram;
         // 4 Save expression for call back
-
+        expressionString = expression;
         // 5 Register with the panel as MouseListener
+        this.addMouseListener(this);
         // 6 Calculate Y scale values (and save them)
+        	//Get min and max Y values
+        double yMin = yValues[0];
+        double yMax = yValues[0];
+        for(int i=1; i<yValues.length; i++){
+        	if(yValues[i] < yMin){
+        		yMin = yValues[i];
+        	}
+        	if(yValues[i] > yMax){
+        		yMax = yValues[i];
+        	}
+        }
+        
+        double yRange =  (yMax - yMin);
+        double yValuePerDiv = yRange/10;
+        double yAxisMin = (yMin - (yValuePerDiv/2));
+        double yAxisMax = (Math.ceil(yMax) + (yValuePerDiv/2));
+        yAxisValues = new double[12]; //Allocate for 12 values (12 y axis tic marks)
+        yAxisValues[0] = yAxisMax;
+        yAxisValues[11] = yAxisMin;
+        for(int i=1; i<yValues.length; i++){
+        	yAxisValues[i] = yValuePerDiv*(i+1);
+        }
+
+        
         // 7 Build miniXYdisplayWindow (reuse for each mouse click!)
         
         
@@ -51,12 +84,29 @@ public class GraphPanel extends JPanel implements MouseListener
     public void paint(Graphics g) // overrides paint() in JPanel!
     {
         // 1 Calculate x and y pixels-to-value conversion factors
+    	
         // 2 Do ALL drawing here in paint()
         int windowWidth  = getWidth(); // call methods
         int windowHeight = getHeight();// in JPanel!
         
-        g.drawLine(300,0,300,600);		//Draw Y axis
-        g.drawLine(0, 300, 600, 300);	//Draw X axis
+        int originX = 50;
+        int originY = windowHeight - 100;
+        
+        
+        g.drawLine(originX,0,originX,originY);		//Draw Y axis
+        g.drawLine(originX, originY, windowWidth, originY);	//Draw X axis
+        
+        //Convert Y values to pixel values for drawing
+        	//Y axis max will equal 0
+        	//Y axis min will equal height of window
+        int[] yAxisPixelValues = new int[12]; //Allocate for 12 values (12 y axis tic marks)
+        yAxisPixelValues[0] = 0;
+        yAxisPixelValues[11] = windowHeight;
+        g.fillOval(originX-2,originY-2,4,4);		// This draws a circle and fills it in
+        											//   Subtract half of the diameter from the X and
+        											//   Y of the point in order to center the circle
+        											//   over the point that we want.
+        System.out.println(windowHeight);
 
     }
 
