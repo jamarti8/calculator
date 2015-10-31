@@ -462,7 +462,8 @@ public class ExpressionCalculator implements ActionListener {
 		System.out.println("X value is: " + startX);
 
 		// read x increment value
-		Double xIncrement = 1.0;
+		Double xIncrement = Double.parseDouble(xIncrementTF.getText());
+		System.out.println("X encrement is: " + xIncrement);
 
 		// read input expression
 		String expression = readExpression();
