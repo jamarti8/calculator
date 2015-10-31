@@ -26,6 +26,7 @@ public class GraphPanel extends JPanel implements MouseListener
 	Calculator calcProgram;
 	String expressionString;
 	double[] yAxisValues;
+	double xPixelsToValueConversionFactor = 1;
 	
 	
 	JFrame miniXYdisplayWindow = new JFrame();
@@ -99,12 +100,16 @@ public class GraphPanel extends JPanel implements MouseListener
         int windowWidth  = getWidth(); // call methods
         int windowHeight = getHeight();// in JPanel!
         
-        int originX = 50;
-        int originY = windowHeight - 100;
+        int originX = 75;
+        int originY = windowHeight - 75;
         
-        
-        g.drawLine(originX,0,originX,originY);		//Draw Y axis
-        g.drawLine(originX, originY, windowWidth, originY);	//Draw X axis
+        g.drawLine(originX,		0,		originX,originY);		//Draw Y axis
+        g.drawLine(originX, originY, windowWidth, originY);		//Draw X axis
+        	// Draw tic marks on axes
+        for(int i=1; i<12; i++){
+        	g.drawLine(originX-2, originY-(originY*i/12), originX+2, originY-(originY*i/12));
+        	g.drawLine(originX+((windowWidth-originX)*i/12), originY-2, originX+((windowWidth-originX)*i/12), originY+2);
+        }
         
         //Convert Y values to pixel values for drawing
         	//Y axis max will equal 0
@@ -112,18 +117,18 @@ public class GraphPanel extends JPanel implements MouseListener
         int[] yAxisPixelValues = new int[12]; //Allocate for 12 values (12 y axis tic marks)
         yAxisPixelValues[0] = 0;
         yAxisPixelValues[11] = windowHeight;
+        
         g.fillOval(originX-2,originY-2,4,4);		// This draws a circle and fills it in
         											//   Subtract half of the diameter from the X and
         											//   Y of the point in order to center the circle
         											//   over the point that we want.
-        System.out.println(windowHeight);
 
     }
 
     
     public void mousePressed(MouseEvent me) // show tiny x,y values window
     {
-    	double xPixelsToValueConversionFactor = 1;
+    	xPixelsToValueConversionFactor = 1;
         // xTextField and yTextField are in the miniXYdisplayWindow
         int xInPixels = me.getX();
         double xValue = xInPixels * xPixelsToValueConversionFactor;
