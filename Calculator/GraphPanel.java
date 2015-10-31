@@ -123,6 +123,7 @@ public class GraphPanel extends JPanel implements MouseListener
     
     public void mousePressed(MouseEvent me) // show tiny x,y values window
     {
+    	double xPixelsToValueConversionFactor = 1;
         // xTextField and yTextField are in the miniXYdisplayWindow
         int xInPixels = me.getX();
         double xValue = xInPixels * xPixelsToValueConversionFactor;
@@ -133,11 +134,16 @@ public class GraphPanel extends JPanel implements MouseListener
         // NEED TO SAVE INSTANCE VARIABLE WITH CALCULATOR IN CONSTRUCTOR
         try {
             calcProgram.valueFromExpression(expressionString, xValue);
-        } catch (NullPointerException npe) {
+        } catch (Exception npe) {
             return;
         }
 
-        String yValueString = calcProgram.valueFromExpression(expressionString,xValue);
+        String yValueString = null;
+		try {
+			yValueString = calcProgram.valueFromExpression(expressionString,xValue);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
         yTextField.setText("Y = " + yValueString);
 
         // show mini x,y display window
