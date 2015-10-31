@@ -54,6 +54,9 @@ public class GraphPanel extends JPanel implements MouseListener
         // 2 Do ALL drawing here in paint()
         int windowWidth  = getWidth(); // call methods
         int windowHeight = getHeight();// in JPanel!
+        
+        g.drawLine(300,0,300,600);		//Draw Y axis
+        g.drawLine(0, 300, 600, 300);	//Draw X axis
 
     }
 

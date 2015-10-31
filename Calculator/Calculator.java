@@ -150,6 +150,7 @@ public class Calculator implements ActionListener {
 		xIncrementPanel.add(xIncrementLabel);
 		xIncrementPanel.add(xIncrementTF);
 		
+		
 		// Set attributes of the GUI objects
 	    mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 	    oneByThree.setHgap(30);
@@ -172,7 +173,6 @@ public class Calculator implements ActionListener {
 		totalWrongTF.setHorizontalAlignment(JTextField.CENTER);
 		errorLabel.setFont(new Font("default", Font.BOLD, 20));
 		enterLabel.setFont(new Font("default", Font.PLAIN, 12));
-		
 		amountTF.setFont(new Font("default", Font.BOLD, 25));
 	    logTextArea.setLineWrap(true);
 	    logTextArea.setWrapStyleWord(true);
@@ -180,6 +180,8 @@ public class Calculator implements ActionListener {
 	    logTextArea.setFont(new Font("default", Font.PLAIN, 12));
 	    totalCorrectTF.setEditable(false);
 	    totalWrongTF.setEditable(false);
+	    	// Graph window
+	    graphWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		// action listeners
 	    clearButton.addActionListener(this);
@@ -252,6 +254,11 @@ public class Calculator implements ActionListener {
 								"<br>Total correct and wrong will be counted. </html>");
 		}
 		if (ae.getSource() == itemGraph){
+			//AFTER TESTING REMOVE THIS COMMENT AND CODE
+			xIncrementTF.setText("1");
+			amountTF.setText("x");
+			//AFTER TESTING REMOVE THIS COMMENT AND CODE
+			
 			calcMode = "graph";
 			xInputPanel.setVisible(true);
 			middleLeftPanel.remove(correctPanel);
@@ -530,9 +537,10 @@ public class Calculator implements ActionListener {
 		// create new graph panel class with parameters from gui
 		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
 		// Show the graph window
-		graphWindow.add(graph);
-	    calcWindow.setSize(1020, 550);
-	    calcWindow.setVisible(true); // show the graphics window
+		graphWindow.setTitle(origExpression);
+		graphWindow.add(graph, "Center");
+	    graphWindow.setSize(620, 635);
+	    graphWindow.setVisible(true); // show the graphics window
 	}
 	
 
