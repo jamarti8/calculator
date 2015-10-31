@@ -28,6 +28,11 @@ public class GraphPanel extends JPanel implements MouseListener
 	double[] yAxisValues;
 	
 	
+	JFrame miniXYdisplayWindow = new JFrame();
+	JLabel   xTextField        = new JLabel();
+	JLabel   yTextField	       = new JLabel();
+	
+	
 	
     public GraphPanel (String     expression, // CONSTRUCTOR
                        double[]   xValues,
@@ -54,6 +59,7 @@ public class GraphPanel extends JPanel implements MouseListener
         this.addMouseListener(this);
         // 6 Calculate Y scale values (and save them)
         	//Get min and max Y values
+        double xMin = xValues[0];
         double yMin = yValues[0];
         double yMax = yValues[0];
         for(int i=1; i<yValues.length; i++){
@@ -75,9 +81,11 @@ public class GraphPanel extends JPanel implements MouseListener
         for(int i=1; i<yValues.length; i++){
         	yAxisValues[i] = yValuePerDiv*(i+1);
         }
-
-        
-       J
+        //build miniXYdisplayWindow
+        miniXYdisplayWindow.getContentPane().add(xTextField, "North");
+        miniXYdisplayWindow.getContentPane().add(yTextField, "South");
+        miniXYdisplayWindow.setSize(100, 100);
+       
         
         
     }
@@ -124,12 +132,12 @@ public class GraphPanel extends JPanel implements MouseListener
         // can use this to calculate a specific y value
         // NEED TO SAVE INSTANCE VARIABLE WITH CALCULATOR IN CONSTRUCTOR
         try {
-            calcProgram.valueFromExpression(expressionString, xValues[0]);
+            calcProgram.valueFromExpression(expressionString, xValue);
         } catch (NullPointerException npe) {
             return;
         }
 
-        String yValueString = calcProgram.valueFromExpression(expressionString,xValueString);
+        String yValueString = calcProgram.valueFromExpression(expressionString,xValue);
         yTextField.setText("Y = " + yValueString);
 
         // show mini x,y display window
@@ -141,7 +149,7 @@ public class GraphPanel extends JPanel implements MouseListener
     {
         // "erase" mini x,y display window
         miniXYdisplayWindow.setVisible(false);
-    } */
+    } 
 
     public void mouseClicked(MouseEvent me){} // take no action
     public void mouseEntered(MouseEvent me){} // on these
