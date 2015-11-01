@@ -27,6 +27,7 @@ public class GraphPanel extends JPanel implements MouseListener
 	String expressionString;
 	double[] yAxisValues;
 	double xPixelsToValueConversionFactor = 1;
+	double yRange;
 	
 	
 	JFrame miniXYdisplayWindow = new JFrame();
@@ -60,7 +61,8 @@ public class GraphPanel extends JPanel implements MouseListener
         this.addMouseListener(this);
         // 6 Calculate Y scale values (and save them)
         	//Get min and max Y values
-        double xMin = xValues[0];
+        yValuesArray = yValues;
+        xValuesArray = xValues;
         double yMin = yValues[0];
         double yMax = yValues[0];
         for(int i=1; i<yValues.length; i++){
@@ -72,7 +74,7 @@ public class GraphPanel extends JPanel implements MouseListener
         	}
         }
         
-        double yRange =  (yMax - yMin);
+        yRange =  (yMax - yMin);
         double yValuePerDiv = yRange/10;
         double yAxisMin = (yMin - (yValuePerDiv/2));
         double yAxisMax = (Math.ceil(yMax) + (yValuePerDiv/2));
@@ -122,7 +124,10 @@ public class GraphPanel extends JPanel implements MouseListener
         											//   Subtract half of the diameter from the X and
         											//   Y of the point in order to center the circle
         											//   over the point that we want.
-
+        
+        for(int i=1; i<xValuesArray.length; i++){	// Use for loop to plot points
+        	
+        }
     }
 
     

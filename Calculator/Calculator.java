@@ -538,8 +538,8 @@ public class Calculator implements ActionListener {
 		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
 		// Show the graph window
 		graphWindow.setTitle(origExpression);
-		graphWindow.add(graph, "Center");
-	    graphWindow.setSize(620, 635);
+		graphWindow.getContentPane().add(graph, "Center");
+	    graphWindow.setSize(750, 700);
 	    graphWindow.setVisible(true); // show the graphics window
 	}
 	
