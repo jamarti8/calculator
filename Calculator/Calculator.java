@@ -598,7 +598,7 @@ public class Calculator implements ActionListener {
         amountTF.setText(" ");
     }
 
-	private Double readXValue()
+	public Double readXValue()
 	{
 		String x = xInputTF.getText().trim();
 		Double xValue;
@@ -623,7 +623,7 @@ public class Calculator implements ActionListener {
 	/*
 	This function reads in the input expression from field and parses it
 	 */
-	private String readExpression()
+	public String readExpression()
 	{
 		String expression = amountTF.getText();
 		if (expression.length() == 0) errorTF.setText("Input an expression");

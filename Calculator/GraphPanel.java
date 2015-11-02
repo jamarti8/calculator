@@ -12,7 +12,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
-import com.sun.xml.internal.bind.v2.model.util.ArrayInfoUtil;
+//import com.sun.xml.internal.bind.v2.model.util.ArrayInfoUtil;
 
 /**
  * Created by kevin on 29.10.15.
@@ -50,13 +50,14 @@ public class GraphPanel extends JPanel implements MouseListener
 
         // 2 Verify x increment is positive
         if ((xValues[1] - xValues[0]) < 0) {
-            System.out.println("recieved x array has negative x increment value");
+            System.out.println("received x array has negative x increment value");
             return;
         }
         // 3 Save Calculator address for call back
         calcProgram = calculatorProgram;
         // 4 Save expression for call back
         expressionString = expression;
+        System.out.println("expression string in constructor is: "+expressionString);
         // 5 Register with the panel as MouseListener
         this.addMouseListener(this);
         // 6 Calculate Y scale values (and save them)
@@ -96,6 +97,7 @@ public class GraphPanel extends JPanel implements MouseListener
     @Override
     public void paint(Graphics g) // overrides paint() in JPanel!
     {
+        System.out.println("expression String in paint method: "+expressionString);
         // 1 Calculate x and y pixels-to-value conversion factors
     	
         // 2 Do ALL drawing here in paint()
@@ -130,7 +132,6 @@ public class GraphPanel extends JPanel implements MouseListener
         }
     }
 
-    
     public void mousePressed(MouseEvent me) // show tiny x,y values window
     {
     	xPixelsToValueConversionFactor = 1;
@@ -141,16 +142,12 @@ public class GraphPanel extends JPanel implements MouseListener
         xTextField.setText("X = " + xValueString);
 
         // can use this to calculate a specific y value
-        // NEED TO SAVE INSTANCE VARIABLE WITH CALCULATOR IN CONSTRUCTOR
-        try {
-            calcProgram.valueFromExpression(expressionString, xValue);
-        } catch (Exception npe) {
-            return;
-        }
-
         String yValueString = null;
+        System.out.println("expression right before y value is found is: "+expressionString);
+        //expressionString = calcProgram.readExpression();
 		try {
 			yValueString = calcProgram.valueFromExpression(expressionString,xValue);
+            System.out.println("returned y value is: " + yValueString);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -165,6 +162,7 @@ public class GraphPanel extends JPanel implements MouseListener
     {
         // "erase" mini x,y display window
         miniXYdisplayWindow.setVisible(false);
+        System.out.println("expression in mouse released: "+ expressionString);
     } 
 
     public void mouseClicked(MouseEvent me){} // take no action
