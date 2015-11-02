@@ -27,7 +27,12 @@ public class GraphPanel extends JPanel implements MouseListener
 	String expressionString;
 	double[] yAxisValues;
 	double xPixelsToValueConversionFactor = 1;
+	double yPixelsToValueConversionFactor = 1;
 	double yRange;
+	double xRange;
+	int padding = 75;
+	double yMin;
+    double yMax;
 	
 	
 	JFrame miniXYdisplayWindow = new JFrame();
@@ -64,8 +69,8 @@ public class GraphPanel extends JPanel implements MouseListener
         	//Get min and max Y values
         yValuesArray = yValues;
         xValuesArray = xValues;
-        double yMin = yValues[0];
-        double yMax = yValues[0];
+        yMin = yValues[0];
+        yMax = yValues[0];
         for(int i=1; i<yValues.length; i++){
         	if(yValues[i] < yMin){
         		yMin = yValues[i];
@@ -74,8 +79,18 @@ public class GraphPanel extends JPanel implements MouseListener
         		yMax = yValues[i];
         	}
         }
-        
+        double xMin = xValues[0];
+        double xMax = xValues[0];
+        for(int i=1; i<xValues.length; i++){
+        	if(xValues[i] < yMin){
+        		xMin = xValues[i];
+        	}
+        	if(xValues[i] > xMax){
+        		xMax = xValues[i];
+        	}
+        }
         yRange =  (yMax - yMin);
+        xRange =  (xMax - yMin);
         double yValuePerDiv = yRange/10;
         double yAxisMin = (yMin - (yValuePerDiv/2));
         double yAxisMax = (Math.ceil(yMax) + (yValuePerDiv/2));
@@ -98,22 +113,45 @@ public class GraphPanel extends JPanel implements MouseListener
     public void paint(Graphics g) // overrides paint() in JPanel!
     {
         System.out.println("expression String in paint method: "+expressionString);
+        
         // 1 Calculate x and y pixels-to-value conversion factors
-    	
-        // 2 Do ALL drawing here in paint()
         int windowWidth  = getWidth(); // call methods
         int windowHeight = getHeight();// in JPanel!
+        //g.clearRect(0, 0, windowWidth, windowHeight);
+        int originX = padding;
+        int originY = windowHeight - padding;
+        double minimumTickRange = yRange / 10;
+        double magnitude = Math.pow(10, Math.floor(Math.log10(minimumTickRange)));
+        double residual = minimumTickRange / magnitude;
+        double tickRange;
+        if(residual > 5){
+        	tickRange = 10 * magnitude;
+        }
+        else if(residual > 2){
+        	tickRange = 5 * magnitude;
+        }
+        else if(residual > 1){
+        	tickRange = 2 * magnitude;
+        }
+        else{
+        	tickRange = magnitude;
+        }
         
-        int originX = 75;
-        int originY = windowHeight - 75;
+    	yPixelsToValueConversionFactor = yRange / originY ;
+    	xPixelsToValueConversionFactor = xRange / originX ;
+        // 2 Do ALL drawing here in paint()
+        
         
         g.drawLine(originX,		0,		originX,originY);		//Draw Y axis
         g.drawLine(originX, originY, windowWidth, originY);		//Draw X axis
         	// Draw tic marks on axes
         for(int i=1; i<12; i++){
         	g.drawLine(originX-2, originY-(originY*i/12), originX+2, originY-(originY*i/12));
+        	g.drawString(Double.toString(tickRange*(i+yMin)), originX-60,originY-(originY*i/12) );
         	g.drawLine(originX+((windowWidth-originX)*i/12), originY-2, originX+((windowWidth-originX)*i/12), originY+2);
+        	
         }
+        //g.drawString(Double.toString(tickRange), 5,10 );
         
         //Convert Y values to pixel values for drawing
         	//Y axis max will equal 0
@@ -130,13 +168,18 @@ public class GraphPanel extends JPanel implements MouseListener
         for(int i=1; i<xValuesArray.length; i++){	// Use for loop to plot points
         	
         }
+        
     }
 
     public void mousePressed(MouseEvent me) // show tiny x,y values window
     {
-    	xPixelsToValueConversionFactor = 1;
+    	//xPixelsToValueConversionFactor = 1;
         // xTextField and yTextField are in the miniXYdisplayWindow
         int xInPixels = me.getX();
+        int yInPixels = me.getY();
+        if(xInPixels < padding || yInPixels > getHeight()-padding){
+        	return;
+        }
         double xValue = xInPixels * xPixelsToValueConversionFactor;
         String xValueString = String.valueOf(xValue);
         xTextField.setText("X = " + xValueString);
