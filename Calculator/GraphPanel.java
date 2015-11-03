@@ -121,8 +121,11 @@ public class GraphPanel extends JPanel implements MouseListener
         int originX = padding;
         int originY = windowHeight - padding;
         double minimumTickRange = yRange / 10;
+        System.out.println(minimumTickRange);
         double magnitude = Math.pow(10, Math.floor(Math.log10(minimumTickRange)));
+        System.out.println(magnitude);
         double residual = minimumTickRange / magnitude;
+        System.out.println(residual);
         double tickRange;
         if(residual > 5){
         	tickRange = 10 * magnitude;
@@ -136,22 +139,27 @@ public class GraphPanel extends JPanel implements MouseListener
         else{
         	tickRange = magnitude;
         }
+        System.out.println(tickRange);
         
-    	yPixelsToValueConversionFactor = yRange / originY ;
-    	xPixelsToValueConversionFactor = xRange / originX ;
+    	//yPixelsToValueConversionFactor = yRange / originY ;
+        double xIncrement = xValuesArray[1] - xValuesArray[0];
+    	xPixelsToValueConversionFactor = xIncrement/((windowWidth-padding)/12);
         // 2 Do ALL drawing here in paint()
         
         
         g.drawLine(originX,		0,		originX,originY);		//Draw Y axis
         g.drawLine(originX, originY, windowWidth, originY);		//Draw X axis
         	// Draw tic marks on axes
+        System.out.println(tickRange);
         for(int i=1; i<12; i++){
         	g.drawLine(originX-2, originY-(originY*i/12), originX+2, originY-(originY*i/12));
-        	g.drawString(Double.toString(tickRange*(i+yMin)), originX-60,originY-(originY*i/12) );
+        	g.drawString(Double.toString(tickRange*(i)+yMin), originX-60,originY-(originY*i/12) );
         	g.drawLine(originX+((windowWidth-originX)*i/12), originY-2, originX+((windowWidth-originX)*i/12), originY+2);
-        	
         }
-        //g.drawString(Double.toString(tickRange), 5,10 );
+        for(int i=0; i<xValuesArray.length; i++){
+        	g.drawString(Double.toString(xValuesArray[i]), originX+((windowWidth-originX)*(i+1)/12)-5,windowHeight-60);
+        }
+
         
         //Convert Y values to pixel values for drawing
         	//Y axis max will equal 0
@@ -180,7 +188,7 @@ public class GraphPanel extends JPanel implements MouseListener
         if(xInPixels < padding || yInPixels > getHeight()-padding){
         	return;
         }
-        double xValue = xInPixels * xPixelsToValueConversionFactor;
+        double xValue = (xInPixels-padding-getWidth()/12) * xPixelsToValueConversionFactor + xValuesArray[0];
         String xValueString = String.valueOf(xValue);
         xTextField.setText("X = " + xValueString);
 
