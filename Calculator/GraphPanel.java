@@ -28,6 +28,7 @@ public class GraphPanel extends JPanel implements MouseListener
 	double[] yAxisValues;
 	double xPixelsToValueConversionFactor = 1;
 	double yPixelsToValueConversionFactor = 1;
+	double yValueToPixelsConversionFactor = 1;
 	double yRange;
 	double xRange;
 	int padding = 75;
@@ -113,19 +114,18 @@ public class GraphPanel extends JPanel implements MouseListener
     public void paint(Graphics g) // overrides paint() in JPanel!
     {
         System.out.println("expression String in paint method: "+expressionString);
-        
         // 1 Calculate x and y pixels-to-value conversion factors
         int windowWidth  = getWidth(); // call methods
         int windowHeight = getHeight();// in JPanel!
-        //g.clearRect(0, 0, windowWidth, windowHeight);
+        g.clearRect(0, 0, windowWidth, windowHeight);
         int originX = padding;
         int originY = windowHeight - padding;
         double minimumTickRange = yRange / 10;
-        System.out.println(minimumTickRange);
+        //System.out.println(minimumTickRange);
         double magnitude = Math.pow(10, Math.floor(Math.log10(minimumTickRange)));
-        System.out.println(magnitude);
+        //System.out.println(magnitude);
         double residual = minimumTickRange / magnitude;
-        System.out.println(residual);
+        //System.out.println(residual);
         double tickRange;
         if(residual > 5){
         	tickRange = 10 * magnitude;
@@ -139,7 +139,7 @@ public class GraphPanel extends JPanel implements MouseListener
         else{
         	tickRange = magnitude;
         }
-        System.out.println(tickRange);
+        //System.out.println(tickRange);
         
     	//yPixelsToValueConversionFactor = yRange / originY ;
         double xIncrement = xValuesArray[1] - xValuesArray[0];
@@ -168,13 +168,22 @@ public class GraphPanel extends JPanel implements MouseListener
         yAxisPixelValues[0] = 0;
         yAxisPixelValues[11] = windowHeight;
         
-        g.fillOval(originX-2,originY-2,4,4);		// This draws a circle and fills it in
+        
+        //g.fillOval(originX-2,originY-2,4,4);		// This draws a circle and fills it in
         											//   Subtract half of the diameter from the X and
         											//   Y of the point in order to center the circle
         											//   over the point that we want.
         
-        for(int i=1; i<xValuesArray.length; i++){	// Use for loop to plot points
-        	
+        for(int i=0,j=xValuesArray.length-1; i<xValuesArray.length; i++,j--){	// Use for loop to plot points
+        	yPixelsToValueConversionFactor = (yRange)/((windowHeight-padding));
+        	double yInPixels = (yValuesArray[j]/yPixelsToValueConversionFactor) + padding;
+        	xPixelsToValueConversionFactor = xIncrement/((windowWidth-padding)/12);
+        	double xInPixels = (xValuesArray[i]/xPixelsToValueConversionFactor) + padding + windowWidth/12 - 6;
+        	//double xInPixels = i*20;
+        	//double yInPixels = 300;
+        	System.out.println("Y: "+yInPixels);
+        	System.out.println("X: "+xInPixels);
+        	g.fillOval((int)Math.round(xInPixels)-3,(int)Math.round(yInPixels)-3,6,6);
         }
         
     }
