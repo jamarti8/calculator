@@ -174,9 +174,11 @@ public class GraphPanel extends JPanel implements MouseListener
         											//   Y of the point in order to center the circle
         											//   over the point that we want.
         
-        for(int i=0,j=xValuesArray.length-1; i<xValuesArray.length; i++,j--){	// Use for loop to plot points
-        	yPixelsToValueConversionFactor = (yRange)/((windowHeight-padding));
-        	double yInPixels = (yValuesArray[j]/yPixelsToValueConversionFactor) + padding;
+        for(int i=0; i<xValuesArray.length; i++){	// Use for loop to plot points
+//        	yPixelsToValueConversionFactor = (tickRange)/((windowHeight/12));
+//        	double yInPixels = (yValuesArray[j]/yPixelsToValueConversionFactor) + padding;
+        	yPixelsToValueConversionFactor = (tickRange)/((windowHeight/12));
+        	double yInPixels = windowHeight-(yValuesArray[i]/yPixelsToValueConversionFactor) - padding;
         	xPixelsToValueConversionFactor = xIncrement/((windowWidth-padding)/12);
         	double xInPixels = (xValuesArray[i]/xPixelsToValueConversionFactor) + padding + windowWidth/12 - 6;
         	//double xInPixels = i*20;
