@@ -537,6 +537,7 @@ public class Calculator implements ActionListener {
 		// create new graph panel class with parameters from gui
 		GraphPanel graph = new GraphPanel(origExpression,xValuesToPass,yValuesToPass,this);
 		// Show the graph window
+		graphWindow.getContentPane().removeAll();
 		graphWindow.setTitle(origExpression);
 		graphWindow.getContentPane().add(graph, "Center");
 	    graphWindow.setSize(750, 700);
