@@ -34,7 +34,8 @@ public class GraphPanel extends JPanel implements MouseListener
 	int padding = 75;
 	double yMin;
     double yMax;
-	
+	int xPreviousPoint = 0;
+	int yPreviousPoint = 0;
 	
 	JFrame miniXYdisplayWindow = new JFrame();
 	JLabel   xTextField        = new JLabel();
@@ -164,9 +165,10 @@ public class GraphPanel extends JPanel implements MouseListener
         //Convert Y values to pixel values for drawing
         	//Y axis max will equal 0
         	//Y axis min will equal height of window
-        int[] yAxisPixelValues = new int[12]; //Allocate for 12 values (12 y axis tic marks)
-        yAxisPixelValues[0] = 0;
-        yAxisPixelValues[11] = windowHeight;
+        
+        //int[] yAxisPixelValues = new int[12]; //Allocate for 12 values (12 y axis tic marks)
+        //yAxisPixelValues[0] = 0;
+        //yAxisPixelValues[11] = windowHeight;
         
         
         //g.fillOval(originX-2,originY-2,4,4);		// This draws a circle and fills it in
@@ -175,17 +177,21 @@ public class GraphPanel extends JPanel implements MouseListener
         											//   over the point that we want.
         
         for(int i=0; i<xValuesArray.length; i++){	// Use for loop to plot points
-//        	yPixelsToValueConversionFactor = (tickRange)/((windowHeight/12));
-//        	double yInPixels = (yValuesArray[j]/yPixelsToValueConversionFactor) + padding;
-        	yPixelsToValueConversionFactor = (tickRange)/((windowHeight/12));
-        	double yInPixels = windowHeight-(yValuesArray[i]/yPixelsToValueConversionFactor) - padding;
+        	yPixelsToValueConversionFactor = (tickRange)/((windowHeight/12));	// find scale value per pixel
+        	double yInPixels = windowHeight-(yValuesArray[i]/yPixelsToValueConversionFactor) - padding;		//This formula was solved for using the formula in mousePressed(). 
         	xPixelsToValueConversionFactor = xIncrement/((windowWidth-padding)/12);
         	double xInPixels = (xValuesArray[i]/xPixelsToValueConversionFactor) + padding + windowWidth/12 - 6;
-        	//double xInPixels = i*20;
-        	//double yInPixels = 300;
-        	System.out.println("Y: "+yInPixels);
-        	System.out.println("X: "+xInPixels);
-        	g.fillOval((int)Math.round(xInPixels)-3,(int)Math.round(yInPixels)-3,6,6);
+        	//System.out.println("Y: "+yInPixels);
+        	//System.out.println("X: "+xInPixels);
+        	int xPoint = (int)Math.round(xInPixels)-3;			//Round coordinates to an integer
+        	int yPoint = (int)Math.round(yInPixels)-3;
+        	g.fillOval(xPoint,yPoint,6,6);						//Draw point
+        	if(xPreviousPoint != 0 && yPreviousPoint != 0){		//If previous point has been set
+        		g.fillOval(xPreviousPoint,yPreviousPoint,6,6);
+        		g.drawLine(xPreviousPoint+4, yPreviousPoint, xPoint+4, yPoint);
+        	}
+        	xPreviousPoint = xPoint;							//Save point in order to draw line next time
+        	yPreviousPoint = yPoint;
         }
         
     }
